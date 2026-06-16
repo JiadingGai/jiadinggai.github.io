@@ -1,0 +1,23 @@
+.profile img,
+.profile .more-info {
+  max-width: 220px;
+}
+
+@media (max-width: 575.98px) {
+  .profile {
+    text-align: center;
+  }
+
+  .profile img {
+    display: block;
+    margin: 1rem auto;
+    width: min(220px, 62vw) !important;
+    max-width: 220px;
+  }
+
+  .profile .more-info {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+}
