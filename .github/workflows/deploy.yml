@@ -39,6 +39,7 @@ jobs:
           bundle exec jekyll build
           npm install -g purgecss
           purgecss -c purgecss.config.js
+          touch _site/.nojekyll
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
