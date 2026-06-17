@@ -5,7 +5,7 @@ permalink: /
 description: GPU systems, CUDA kernels, compiler engineering, ML infrastructure, and efficient LLM training.
 subtitle: Senior Applied Scientist, AWS Bedrock DS3 and AWS AI Labs
 profile:
-  image: jiading-gai.jpg
+  image: church-lambda-icon.svg
 ---
 
 I am a senior applied scientist and technical lead working on CUDA/GPU systems optimization, compiler engineering, machine learning infrastructure, and reinforcement learning systems for LLMs.

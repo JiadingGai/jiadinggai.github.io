@@ -17,7 +17,7 @@ layout: default
     {% endif %}
     <div class="contact">
       {% if site.location %}<p>{{ site.location }}</p>{% endif %}
-      {% if site.email %}<p>{{ site.email }}</p>{% endif %}
+      {% if site.email %}<p>{{ site.email | escape }}</p>{% endif %}
       <p><a href="https://github.com/JiadingGai">GitHub</a> / <a href="https://scholar.google.com/citations?hl=en&user=B0OBVgsAAAAJ">Google Scholar</a></p>
     </div>
   </aside>
