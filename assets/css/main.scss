@@ -1,25 +1,218 @@
 ---
-# Only the main Sass file needs front matter (the dashes are enough)
 ---
-@charset "utf-8";
 
-@use "sass:math";
-@use "sass:string";
+@import "{{ site.theme }}";
 
-@use "variables" with (
-  $max-content-width: {{ site.max_width | default:  "930px" }}
-);
+:root {
+  --text: #1f2933;
+  --muted: #657586;
+  --border: #d9e2ec;
+  --surface: #f8fafc;
+  --accent: #1f6feb;
+}
 
-@use "themes";
-@use "layout";
-@use "typography";
-@use "navbar";
-@use "footer";
-@use "blog";
-@use "publications";
-@use "components";
-@use "utilities";
-@use "tabs";
-@use "teachings";
-@use "typograms";
-@use "custom";
+body {
+  color: var(--text);
+  line-height: 1.65;
+}
+
+.wrapper {
+  max-width: 960px;
+}
+
+.site-header {
+  border-top: 0;
+}
+
+.header-wrapper {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding-bottom: 0.85rem;
+  padding-top: 0.85rem;
+}
+
+.brand-link,
+.brand-link:visited {
+  align-items: center;
+  color: var(--text);
+  display: inline-flex;
+  gap: 0.55rem;
+  text-decoration: none;
+}
+
+.brand-icon {
+  flex: 0 0 auto;
+  height: 42px;
+  width: 42px;
+}
+
+.site-title,
+.site-title:visited {
+  color: var(--text);
+  display: block;
+  float: none;
+  font-size: 1.35rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.site-tagline {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0.25rem 0 0;
+}
+
+.site-nav {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  line-height: 1.4;
+  position: static;
+}
+
+.site-nav a {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.92rem;
+  padding: 0.35rem 0.58rem;
+  text-decoration: none;
+}
+
+.site-nav a:hover {
+  background: var(--surface);
+}
+
+.page-content {
+  padding: 2.2rem 0;
+}
+
+.page-content h1,
+.page-content h2,
+.page-content h3 {
+  color: var(--text);
+  letter-spacing: 0;
+}
+
+.page-content h2 {
+  margin-top: 2.2rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 1.35rem;
+}
+
+.page-content h3 {
+  font-size: 1.1rem;
+}
+
+.lead {
+  color: var(--muted);
+  font-size: 1.08rem;
+}
+
+.profile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 2rem;
+  align-items: start;
+  margin-bottom: 2rem;
+}
+
+.profile-photo {
+  width: 220px;
+  max-width: 100%;
+  border-radius: 50%;
+}
+
+.contact {
+  color: var(--muted);
+  margin-top: 0.75rem;
+}
+
+.contact p {
+  margin-bottom: 0.25rem;
+}
+
+.list-plain {
+  margin-left: 0;
+  list-style: none;
+}
+
+.item {
+  margin: 0 0 1.25rem;
+}
+
+.item-title {
+  margin: 0 0 0.15rem;
+  font-weight: 650;
+}
+
+.item-meta {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0 0 0.35rem;
+}
+
+.item-links a {
+  margin-right: 0.65rem;
+}
+
+.badge {
+  display: inline-block;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1;
+  margin-left: 0.35rem;
+  padding: 0.25rem 0.45rem;
+  vertical-align: middle;
+}
+
+.news-list time {
+  color: var(--muted);
+  display: inline-block;
+  min-width: 7.25rem;
+}
+
+.post-list > li {
+  margin-bottom: 1.25rem;
+}
+
+pre,
+code {
+  border-color: var(--border);
+  border-radius: 6px;
+}
+
+pre {
+  background: var(--surface);
+  padding: 1rem;
+}
+
+.site-footer {
+  color: var(--muted);
+}
+
+@media (max-width: 700px) {
+  .header-wrapper {
+    display: block;
+  }
+
+  .site-nav {
+    margin-top: 0.9rem;
+  }
+
+  .profile {
+    display: block;
+  }
+
+  .profile-aside {
+    margin: 1.25rem 0 0;
+    text-align: center;
+  }
+}

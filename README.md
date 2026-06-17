@@ -1,22 +1,19 @@
 # Jiading Gai Personal Website
 
-This site uses the MIT-licensed [al-folio](https://github.com/alshedivat/al-folio) Jekyll theme.
+This site uses the GitHub Pages-supported [Minima](https://github.com/jekyll/minima) Jekyll theme.
 
-## Local Preview
+## Publishing
 
-Use Homebrew Ruby on this machine:
+No local build is required for normal publishing. Push changes to `main`, then use GitHub Pages with:
 
-```bash
-/opt/homebrew/opt/ruby/bin/bundle install
-/opt/homebrew/opt/ruby/bin/bundle exec jekyll build
-python3 -m http.server 8124 --directory _site
-```
-
-Then open <http://127.0.0.1:8124/>.
+- Source: `Deploy from a branch`
+- Branch: `main`
+- Folder: `/ (root)`
 
 ## Content
 
 - Main profile: `_pages/about.md`
-- Publications: `_bibliography/papers.bib`
+- Publications: `_data/publications.yml`
 - Projects: `_projects/`
 - Patents: `_pages/patents.md`
+- Blog posts: `_posts/`

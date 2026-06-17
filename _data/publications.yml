@@ -1,0 +1,95 @@
+- title: "Optimizing CUDA Like a Human: Bottleneck Analyzers as Expert Surrogates for LLM Kernel Optimization"
+  authors: "Jiading Gai and collaborators"
+  venue: "Under review with Transactions on Machine Learning Research"
+  year: 2026
+  selected: true
+
+- title: "DualKV: Shared-Prompt Flash Attention for Efficient RL Training with Large Rollouts and Long Contexts"
+  authors: "Jiading Gai, Shuai Zhang, Xiang Song, Bernie Wang, and George Karypis"
+  venue: "arXiv preprint"
+  year: 2026
+  selected: true
+  links:
+    - label: "paper"
+      url: "https://arxiv.org/abs/2605.15422"
+    - label: "pdf"
+      url: "https://arxiv.org/pdf/2605.15422"
+    - label: "code"
+      url: "https://github.com/amazon-science/dualkv-flash-attn-for-rl"
+
+- title: "HetRL: Efficient Reinforcement Learning for LLMs in Heterogeneous Environments"
+  authors: "Yongjun He, Shuai Zhang, Jiading Gai, Xiyuan Zhang, Boran Han, Bernie Wang, Huzefa Rangwala, and George Karypis"
+  venue: "Proceedings of Machine Learning and Systems"
+  year: 2026
+  selected: true
+  award: "MLSys 2026 Oral"
+  links:
+    - label: "paper"
+      url: "https://arxiv.org/abs/2512.12476"
+
+- title: "Optimizing Memory-Access Patterns for Deep Learning Accelerators"
+  authors: "Hongbo Zheng, Sang Oh, Hsien-Hsin Wang, Peter Briggs, Jiading Gai, and collaborators"
+  venue: "2nd Compilers for Machine Learning Workshop, CGO"
+  year: 2020
+  links:
+    - label: "paper"
+      url: "https://arxiv.org/abs/2002.12798"
+
+- title: "The Externalities of High-Frequency Trading"
+  authors: "Jiading Gai, Chen Yao, and Mao Ye"
+  venue: "SEC seminar"
+  year: 2013
+  note: "Cited in the U.S. Senate hearing [*Computerized Trading: What Should the Rules of the Road Be?*](https://www.congress.gov/112/chrg/CHRG-112shrg80168/CHRG-112shrg80168.pdf#page=38), pp. 34-35."
+  links:
+    - label: "pdf"
+      url: "https://www.sec.gov/divisions/riskfin/seminar/ye031513.pdf"
+    - label: "hearing"
+      url: "https://www.congress.gov/112/chrg/CHRG-112shrg80168/CHRG-112shrg80168.pdf#page=38"
+
+- title: "Fast Construction of Nanosecond Level Snapshots of Financial Markets"
+  authors: "Jiading Gai and collaborators"
+  venue: "Proceedings of XSEDE"
+  year: 2013
+  links:
+    - label: "doi"
+      url: "https://doi.org/10.1145/2484762.2484825"
+
+- title: "More IMPATIENT: A Gridding-Accelerated Toeplitz-Based Strategy for Non-Cartesian High-Resolution 3D MRI on GPUs"
+  authors: "Jiading Gai, Nabil Obeid, Joseph L. Holtrop, Xiaodong Wu, Freddy Lam, Matt Fu, Justin P. Haldar, Zhizhou Wen, Wen-Mei W. Hwu, Zhi-Pei Liang, and Bradley P. Sutton"
+  venue: "Journal of Parallel and Distributed Computing"
+  year: 2013
+  links:
+    - label: "doi"
+      url: "https://doi.org/10.1016/j.jpdc.2013.01.001"
+
+- title: "Robust Contour Tracking Based on a Coupling Between Geodesic Active Contours and Conditional Random Fields"
+  authors: "Jiading Gai and Robert Stevenson"
+  venue: "Journal of Visual Communication and Image Representation"
+  year: 2011
+  links:
+    - label: "doi"
+      url: "https://doi.org/10.1016/j.jvcir.2010.10.001"
+
+- title: "Studentized Dynamical System for Robust Object Tracking"
+  authors: "Jiading Gai and Robert Stevenson"
+  venue: "IEEE Transactions on Image Processing"
+  year: 2011
+  links:
+    - label: "doi"
+      url: "https://doi.org/10.1109/TIP.2010.2060343"
+
+- title: "Optical Flow With p-Harmonic Regularization"
+  authors: "Jiading Gai and Robert Stevenson"
+  venue: "IEEE International Conference on Image Processing"
+  year: 2010
+  links:
+    - label: "doi"
+      url: "https://doi.org/10.1109/ICIP.2010.5652244"
+
+- title: "Matte-Based Restoration of Vintage Video"
+  authors: "Jiading Gai and Sing Bing Kang"
+  venue: "IEEE Transactions on Image Processing"
+  year: 2009
+  links:
+    - label: "doi"
+      url: "https://doi.org/10.1109/TIP.2009.2025804"

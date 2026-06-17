@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Church lambda calculus icon</title>
+  <desc id="desc">A rounded lambda mark with lambda-calculus notation inspired by Alonzo Church.</desc>
+  <defs>
+    <linearGradient id="ring" x1="43" y1="213" x2="213" y2="43" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f7b955"/>
+      <stop offset="0.46" stop-color="#f06f4f"/>
+      <stop offset="1" stop-color="#2f80a7"/>
+    </linearGradient>
+    <linearGradient id="lambda" x1="74" y1="178" x2="182" y2="78" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f5c65b"/>
+      <stop offset="0.5" stop-color="#ef7d56"/>
+      <stop offset="1" stop-color="#225f88"/>
+    </linearGradient>
+    <clipPath id="inner-disc">
+      <circle cx="128" cy="128" r="82"/>
+    </clipPath>
+    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#1f2933" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#soft-shadow)">
+    <circle cx="128" cy="128" r="96" fill="none" stroke="#d8e2ec" stroke-width="22"/>
+    <circle cx="128" cy="128" r="96" fill="none" stroke="url(#ring)" stroke-width="16" stroke-linecap="round"/>
+  </g>
+
+  <g clip-path="url(#inner-disc)">
+    <g opacity="0.5">
+      <path d="M56 168 C82 112 105 98 130 126 C152 151 173 151 199 89" fill="none" stroke="#2f80a7" stroke-width="4" stroke-linecap="round"/>
+      <path d="M67 83 H189 M67 128 H189 M67 173 H189 M83 67 V189 M128 67 V189 M173 67 V189" fill="none" stroke="#c8d5df" stroke-width="1.5"/>
+      <circle cx="82" cy="139" r="4.5" fill="#2f80a7"/>
+      <circle cx="128" cy="126" r="4.5" fill="#f06f4f"/>
+      <circle cx="174" cy="138" r="4.5" fill="#f7b955"/>
+      <path d="M82 139 L128 126 L174 138" fill="none" stroke="#4d9f94" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+    <g fill="#225f88" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="650" opacity="0.66">
+      <text x="72" y="78" font-size="17">λx.x</text>
+      <text x="147" y="109" font-size="15">β</text>
+      <text x="116" y="202" font-size="13">λf.λx.f(f x)</text>
+    </g>
+    <path d="M149 96 C168 88 183 91 194 104" fill="none" stroke="#f06f4f" stroke-width="3" stroke-linecap="round" opacity="0.68"/>
+    <path d="M194 104 L184 102 L190 94" fill="none" stroke="#f06f4f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.68"/>
+  </g>
+
+  <g filter="url(#soft-shadow)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M91 85 C106 82 122 82 138 86" fill="none" stroke="#ffffff" stroke-width="31"/>
+    <path d="M78 186 C95 148 112 111 130 74 C149 118 169 153 191 186" fill="none" stroke="#ffffff" stroke-width="31"/>
+    <path d="M91 85 C106 82 122 82 138 86" fill="none" stroke="url(#lambda)" stroke-width="20"/>
+    <path d="M78 186 C95 148 112 111 130 74 C149 118 169 153 191 186" fill="none" stroke="url(#lambda)" stroke-width="20"/>
+    <circle cx="191" cy="186" r="6" fill="#f5c65b"/>
+  </g>
+</svg>
