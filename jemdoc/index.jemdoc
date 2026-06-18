@@ -40,6 +40,6 @@ Senior Applied Scientist, AWS Bedrock DS3 and AWS AI Labs
 
 == Recent Publications
 
-- *Optimizing CUDA Like a Human: Bottleneck Analyzers as Expert Surrogates for LLM Kernel Optimization.* Jiading Gai and collaborators. Under review with Transactions on Machine Learning Research, 2026.
+- *Optimizing CUDA Like a Human: Bottleneck Analyzers as Expert Surrogates for LLM Kernel Optimization.* Jiading Gai et. al. Under review with Transactions on Machine Learning Research, 2026.
 - *DualKV: Shared-Prompt Flash Attention for Efficient RL Training with Large Rollouts and Long Contexts.* Jiading Gai, Shuai Zhang, Xiang Song, Bernie Wang, and George Karypis. arXiv preprint, 2026. [https://arxiv.org/abs/2605.15422 paper] [https://github.com/amazon-science/dualkv-flash-attn-for-rl code]
 - *HetRL: Efficient Reinforcement Learning for LLMs in Heterogeneous Environments.* Yongjun He, Shuai Zhang, Jiading Gai, Xiyuan Zhang, Boran Han, Bernie Wang, Huzefa Rangwala, and George Karypis. Proceedings of Machine Learning and Systems, 2026. MLSys 2026 Oral. [https://arxiv.org/abs/2512.12476 paper]

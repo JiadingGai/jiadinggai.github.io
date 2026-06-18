@@ -3,9 +3,9 @@
 = Publications
 Selected research publications and public research artifacts.
 
-== Selected And Recent
+== Recent Publications
 
-- *Optimizing CUDA Like a Human: Bottleneck Analyzers as Expert Surrogates for LLM Kernel Optimization.* Jiading Gai and collaborators. Under review with Transactions on Machine Learning Research, 2026.
+- *Optimizing CUDA Like a Human: Bottleneck Analyzers as Expert Surrogates for LLM Kernel Optimization.* Jiading Gai et. al. Under review with Transactions on Machine Learning Research, 2026.
 
 - *DualKV: Shared-Prompt Flash Attention for Efficient RL Training with Large Rollouts and Long Contexts.* Jiading Gai, Shuai Zhang, Xiang Song, Bernie Wang, and George Karypis. arXiv preprint, 2026. [https://arxiv.org/abs/2605.15422 paper] [https://arxiv.org/pdf/2605.15422 pdf] [https://github.com/amazon-science/dualkv-flash-attn-for-rl code]
 
@@ -13,7 +13,7 @@ Selected research publications and public research artifacts.
 
 == Earlier Work
 
-- *Optimizing Memory-Access Patterns for Deep Learning Accelerators.* Hongbo Zheng, Sang Oh, Hsien-Hsin Wang, Peter Briggs, Jiading Gai, and collaborators. 2nd Compilers for Machine Learning Workshop, CGO, 2020. [https://arxiv.org/abs/2002.12798 paper]
+- *Optimizing Memory-Access Patterns for Deep Learning Accelerators.* Hongbin Zheng, Sejong Oh, Huiqing Wang, Preston Briggs, Jiading Gai, Animesh Jain, Yizhi Liu, Rich Heaton, Randy Huang, and Yida Wang. 2nd Compilers for Machine Learning Workshop, CGO, 2020. [https://arxiv.org/abs/2002.12798 paper]
 
 ~
 {}{raw}
@@ -22,7 +22,7 @@ Selected research publications and public research artifacts.
 </ul>
 ~
 
-- *Fast Construction of Nanosecond Level Snapshots of Financial Markets.* Jiading Gai and collaborators. Proceedings of XSEDE, 2013. [https://doi.org/10.1145/2484762.2484825 doi]
+- *Fast Construction of Nanosecond Level Snapshots of Financial Markets.* Jiading Gai, Dong Ju Choi, David O'Neal, Mao Ye, and Robert S. Sinkovits. Proceedings of XSEDE, 2013. [https://doi.org/10.1145/2484762.2484825 doi]
 
 - *More IMPATIENT: A Gridding-Accelerated Toeplitz-Based Strategy for Non-Cartesian High-Resolution 3D MRI on GPUs.* Jiading Gai, Nabil Obeid, Joseph L. Holtrop, Xiaodong Wu, Freddy Lam, Matt Fu, Justin P. Haldar, Zhizhou Wen, Wen-Mei W. Hwu, Zhi-Pei Liang, and Bradley P. Sutton. Journal of Parallel and Distributed Computing, 2013. [https://doi.org/10.1016/j.jpdc.2013.01.001 doi]
 
