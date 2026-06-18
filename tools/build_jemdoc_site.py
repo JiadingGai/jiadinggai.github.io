@@ -53,6 +53,8 @@ def postprocess_html(path: Path, output: str) -> None:
 
 
 def main() -> int:
+    env = os.environ.copy()
+    env.setdefault("PYTHONWARNINGS", "ignore::SyntaxWarning")
     for source, output in PAGES:
         output_path = ROOT / output
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -61,7 +63,7 @@ def main() -> int:
             jemdoc_cmd = [sys.executable, JEMDOC]
         cmd = jemdoc_cmd + ["-c", str(CONF), "-o", str(output_path), str(ROOT / source)]
         print(" ".join(cmd))
-        subprocess.run(cmd, cwd=ROOT, check=True)
+        subprocess.run(cmd, cwd=ROOT, check=True, env=env)
         postprocess_html(output_path, output)
     return 0
 
