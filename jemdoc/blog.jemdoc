@@ -1,0 +1,8 @@
+# jemdoc: menu{jemdoc/MENU}{blog/index.html}{../}
+# jemdoc: nofooter
+= Blog
+Short technical notes.
+
+== Posts
+
+- Jun. 16, 2026: [2026/mytransformers/index.html Transformer MT System: Core Math]. Core Transformer math for a small German-to-English MT exercise.

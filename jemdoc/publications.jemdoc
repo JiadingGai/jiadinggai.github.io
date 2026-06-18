@@ -1,0 +1,35 @@
+# jemdoc: menu{jemdoc/MENU}{publications/index.html}{../}
+# jemdoc: nofooter
+= Publications
+Selected research publications and public research artifacts.
+
+== Selected And Recent
+
+- *Optimizing CUDA Like a Human: Bottleneck Analyzers as Expert Surrogates for LLM Kernel Optimization.* Jiading Gai and collaborators. Under review with Transactions on Machine Learning Research, 2026.
+
+- *DualKV: Shared-Prompt Flash Attention for Efficient RL Training with Large Rollouts and Long Contexts.* Jiading Gai, Shuai Zhang, Xiang Song, Bernie Wang, and George Karypis. arXiv preprint, 2026. [https://arxiv.org/abs/2605.15422 paper] [https://arxiv.org/pdf/2605.15422 pdf] [https://github.com/amazon-science/dualkv-flash-attn-for-rl code]
+
+- *HetRL: Efficient Reinforcement Learning for LLMs in Heterogeneous Environments.* Yongjun He, Shuai Zhang, Jiading Gai, Xiyuan Zhang, Boran Han, Bernie Wang, Huzefa Rangwala, and George Karypis. Proceedings of Machine Learning and Systems, 2026. MLSys 2026 Oral. [https://arxiv.org/abs/2512.12476 paper]
+
+== Earlier Work
+
+- *Optimizing Memory-Access Patterns for Deep Learning Accelerators.* Hongbo Zheng, Sang Oh, Hsien-Hsin Wang, Peter Briggs, Jiading Gai, and collaborators. 2nd Compilers for Machine Learning Workshop, CGO, 2020. [https://arxiv.org/abs/2002.12798 paper]
+
+~
+{}{raw}
+<ul class="inline-publication">
+  <li><p><b>The Externalities of High-Frequency Trading.</b> Jiading Gai, Chen Yao, and Mao Ye. SEC seminar, 2013. Cited in the U.S. Senate hearing <a href="https://www.congress.gov/112/chrg/CHRG-112shrg80168/CHRG-112shrg80168.pdf#page=38"><em>Computerized Trading: What Should the Rules of the Road Be?</em></a>, pp. 34-35. <a href="https://www.sec.gov/divisions/riskfin/seminar/ye031513.pdf">pdf</a> <a href="https://www.congress.gov/112/chrg/CHRG-112shrg80168/CHRG-112shrg80168.pdf#page=38">hearing</a></p></li>
+</ul>
+~
+
+- *Fast Construction of Nanosecond Level Snapshots of Financial Markets.* Jiading Gai and collaborators. Proceedings of XSEDE, 2013. [https://doi.org/10.1145/2484762.2484825 doi]
+
+- *More IMPATIENT: A Gridding-Accelerated Toeplitz-Based Strategy for Non-Cartesian High-Resolution 3D MRI on GPUs.* Jiading Gai, Nabil Obeid, Joseph L. Holtrop, Xiaodong Wu, Freddy Lam, Matt Fu, Justin P. Haldar, Zhizhou Wen, Wen-Mei W. Hwu, Zhi-Pei Liang, and Bradley P. Sutton. Journal of Parallel and Distributed Computing, 2013. [https://doi.org/10.1016/j.jpdc.2013.01.001 doi]
+
+- *Robust Contour Tracking Based on a Coupling Between Geodesic Active Contours and Conditional Random Fields.* Jiading Gai and Robert Stevenson. Journal of Visual Communication and Image Representation, 2011. [https://doi.org/10.1016/j.jvcir.2010.10.001 doi]
+
+- *Studentized Dynamical System for Robust Object Tracking.* Jiading Gai and Robert Stevenson. IEEE Transactions on Image Processing, 2011. [https://doi.org/10.1109/TIP.2010.2060343 doi]
+
+- *Optical Flow With p-Harmonic Regularization.* Jiading Gai and Robert Stevenson. IEEE International Conference on Image Processing, 2010. [https://doi.org/10.1109/ICIP.2010.5652244 doi]
+
+- *Matte-Based Restoration of Vintage Video.* Jiading Gai and Sing Bing Kang. IEEE Transactions on Image Processing, 2009. [https://doi.org/10.1109/TIP.2009.2025804 doi]

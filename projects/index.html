@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="generator" content="jemdoc+MathJax, see https://github.com/wsshin/jemdoc_mathjax" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="GPU systems, CUDA kernels, compiler engineering, ML infrastructure, and efficient LLM training." />
+<link rel="icon" type="image/svg+xml" href="/assets/img/church-lambda-icon.svg" />
+<link rel="stylesheet" href="/assets/css/jemdoc.css" type="text/css" />
+<title>Projects</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [["$", "$"], ["\\(", "\\)"]], displayMath: [["$$", "$$"], ["\\[", "\\]"]] },
+  svg: { fontCache: "global" }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+<table summary="Table for page layout." id="tlayout">
+<tr valign="top">
+<td id="layout-menu">
+<div class="menu-category">Jiading Gai</div>
+<div class="menu-item"><a href="../index.html">Home</a></div>
+<div class="menu-item"><a href="../publications/index.html">Publications</a></div>
+<div class="menu-item"><a href="../projects/index.html" class="current">Projects</a></div>
+<div class="menu-item"><a href="../blog/index.html">Blog</a></div>
+<div class="menu-item"><a href="../patents/index.html">Patents</a></div>
+<div class="menu-category">Links</div>
+<div class="menu-item"><a href="https://github.com/JiadingGai" target="_blank">GitHub</a></div>
+<div class="menu-item"><a href="https://scholar.google.com/citations?hl=en&user=B0OBVgsAAAAJ" target="_blank">Google&nbsp;Scholar</a></div>
+</td>
+<td id="layout-content">
+<div id="toptitle">
+<h1>Projects</h1>
+<div id="subtitle">Selected research and engineering projects.
+</div>
+</div>
+<h2>DualKV</h2>
+<p>Shared-prompt FlashAttention for efficient RL training with large rollouts and long contexts.
+</p>
+<p>DualKV removes redundant shared-prompt attention work in large-rollout RL training by combining a FlashAttention-style CUDA forward and backward kernel with a veRL data-pipeline redesign.
+</p>
+<p>The project targets long-context, many-rollout training regimes where the prompt is shared but completions diverge. The result is better policy-update throughput and lower wasted computation while keeping exact attention semantics.
+</p>
+<p><a href="https://arxiv.org/abs/2605.15422" target="_blank">paper</a> <a href="https://github.com/amazon-science/dualkv-flash-attn-for-rl" target="_blank">code</a>
+</p>
+<h2>Multi-Agent CUDA Kernel Optimizer</h2>
+<p>Bottleneck-analyzer agents for CUDA diagnosis and optimization.
+</p>
+<p>This project builds a multi-agent framework for autonomous CUDA kernel optimization. The key idea is to use bottleneck analyzers as expert surrogates that reason from occupancy, memory behavior, SASS, NCU metrics, roofline analysis, and Hopper WGMMA/TMA utilization.
+</p>
+<p>The framework was applied to kernel-benchmark tasks and production Hopper grouped-GEMM optimization work.
+</p>
+<h2>IMPATIENT MRI</h2>
+<p>GPU-accelerated MRI reconstruction toolkit.
+</p>
+<p>The IMPATIENT MRI toolkit implements massively parallel MRI reconstruction methods on GPUs, including Bayesian reconstruction techniques using Markov Random Fields to impose spatial smoothness.
+</p>
+<p><a href="https://github.com/JiadingGai/Impatient-MRI" target="_blank">GitHub</a>
+</p>
+</td>
+</tr>
+</table>
+</body>
+</html>

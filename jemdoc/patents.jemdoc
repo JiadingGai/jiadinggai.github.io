@@ -1,0 +1,13 @@
+# jemdoc: menu{jemdoc/MENU}{patents/index.html}{../}
+# jemdoc: nofooter
+= Patents
+Patents and invention disclosures.
+
+1. [https://patents.justia.com/patent/12530178 US 12,530,178], "Matmult Packing," granted Jan. 2026. Industry-first matmul auto-vectorization for AI accelerators.
+2. [https://patents.justia.com/patent/12400137 US 12,400,137], "Bidirectional Network on Data-Flow Processors," granted Aug. 2025.
+3. [https://patents.justia.com/patent/12159218 US 12,159,218], "Dropout Layer in a Neural Network Processor," granted Dec. 2024.
+4. P66029, "Tensor Alignment during Runtime on a Data Flow Centric Accelerator," filed 2019.
+5. P61139, "Global Selection Guidance: Cross-border Product Recommendations," filed 2018.
+6. [https://patents.google.com/patent/US10607228B1/en US 10,607,228 B1], "Dynamic Rule Strategy and Fraud Detection," granted 2017.
+7. [https://patents.google.com/patent/US7623707B2/en US 7,623,707 B2], "Matte-Based Video Restoration," granted 2009.
+8. [https://patents.google.com/patent/US7839406B2/en US 7,839,406 B2], "Methods and Systems for Setting a Backlight Level," granted 2010.

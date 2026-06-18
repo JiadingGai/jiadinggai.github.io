@@ -1,0 +1,30 @@
+# jemdoc: menu{jemdoc/MENU}{projects/index.html}{../}
+# jemdoc: nofooter
+= Projects
+Selected research and engineering projects.
+
+== DualKV
+
+Shared-prompt FlashAttention for efficient RL training with large rollouts and long contexts.
+
+DualKV removes redundant shared-prompt attention work in large-rollout RL training by combining a FlashAttention-style CUDA forward and backward kernel with a veRL data-pipeline redesign.
+
+The project targets long-context, many-rollout training regimes where the prompt is shared but completions diverge. The result is better policy-update throughput and lower wasted computation while keeping exact attention semantics.
+
+[https://arxiv.org/abs/2605.15422 paper] [https://github.com/amazon-science/dualkv-flash-attn-for-rl code]
+
+== Multi-Agent CUDA Kernel Optimizer
+
+Bottleneck-analyzer agents for CUDA diagnosis and optimization.
+
+This project builds a multi-agent framework for autonomous CUDA kernel optimization. The key idea is to use bottleneck analyzers as expert surrogates that reason from occupancy, memory behavior, SASS, NCU metrics, roofline analysis, and Hopper WGMMA/TMA utilization.
+
+The framework was applied to kernel-benchmark tasks and production Hopper grouped-GEMM optimization work.
+
+== IMPATIENT MRI
+
+GPU-accelerated MRI reconstruction toolkit.
+
+The IMPATIENT MRI toolkit implements massively parallel MRI reconstruction methods on GPUs, including Bayesian reconstruction techniques using Markov Random Fields to impose spatial smoothness.
+
+[https://github.com/JiadingGai/Impatient-MRI GitHub]

@@ -1,0 +1,45 @@
+# jemdoc: menu{jemdoc/MENU}{index.html}
+# jemdoc: nofooter
+= Jiading Gai
+Senior Applied Scientist, AWS Bedrock DS3 and AWS AI Labs
+
+~
+{}{raw}
+<div class="profile-hero">
+  <div class="profile-copy">
+    <p>I am a senior applied scientist and technical lead working on CUDA and GPU systems optimization, compiler engineering, machine learning infrastructure, and reinforcement learning systems for LLMs.</p>
+    <p>My recent work focuses on efficient LLM training and inference: FlashAttention-style kernels, shared-prompt attention for RL training, GPU kernel optimization agents, and compiler/runtime optimizations for AI accelerators. I have worked on production-scale ML systems at AWS Bedrock, AWS Q Developer, JP Morgan Chase, and Microsoft Research.</p>
+    <p>I am especially interested in systems that connect low-level performance engineering with large-scale learning workloads: CUDA, CUTLASS and CuTe, WGMMA and TMA, compiler scheduling, kernel autotuning, long-context inference, and RL training infrastructure.</p>
+  </div>
+  <aside class="profile-aside">
+    <img class="profile-icon" src="/assets/img/church-lambda-icon.svg" alt="Church lambda calculus icon" />
+    <p>Seattle, WA<br />&lt;first&gt;.&lt;last&gt;@gmail.com</p>
+    <p><a href="https://github.com/JiadingGai">GitHub</a> / <a href="https://scholar.google.com/citations?hl=en&user=B0OBVgsAAAAJ">Google Scholar</a></p>
+  </aside>
+</div>
+~
+
+== Current Highlights
+
+- *DualKV shared-prompt FlashAttention.* Designed and implemented a CUDA forward/backward kernel and veRL data-pipeline redesign for large-rollout RL training.
+- *Multi-agent CUDA kernel optimizer.* Built a kernel optimization framework using bottleneck analyzers for occupancy, memory behavior, SASS, NCU, roofline, and Hopper WGMMA/TMA diagnosis.
+- *Compiler and accelerator systems.* Developed compiler transformations, scheduling optimizations, and backend code-generation improvements for AI accelerator workloads.
+
+== Public Impact
+
+~
+{}{raw}
+<p>Our high-frequency trading research was cited in the U.S. Senate hearing <a href="https://www.congress.gov/112/chrg/CHRG-112shrg80168/CHRG-112shrg80168.pdf#page=38"><em>Computerized Trading: What Should the Rules of the Road Be?</em></a>.</p>
+~
+
+== News
+
+- Jun. 16, 2026: HetRL was accepted as an oral presentation at MLSys 2026.
+- May 20, 2026: DualKV was released as an arXiv preprint.
+- Jan. 15, 2026: US 12,530,178, "Matmult Packing," was granted.
+
+== Recent Publications
+
+- *Optimizing CUDA Like a Human: Bottleneck Analyzers as Expert Surrogates for LLM Kernel Optimization.* Jiading Gai and collaborators. Under review with Transactions on Machine Learning Research, 2026.
+- *DualKV: Shared-Prompt Flash Attention for Efficient RL Training with Large Rollouts and Long Contexts.* Jiading Gai, Shuai Zhang, Xiang Song, Bernie Wang, and George Karypis. arXiv preprint, 2026. [https://arxiv.org/abs/2605.15422 paper] [https://github.com/amazon-science/dualkv-flash-attn-for-rl code]
+- *HetRL: Efficient Reinforcement Learning for LLMs in Heterogeneous Environments.* Yongjun He, Shuai Zhang, Jiading Gai, Xiyuan Zhang, Boran Han, Bernie Wang, Huzefa Rangwala, and George Karypis. Proceedings of Machine Learning and Systems, 2026. MLSys 2026 Oral. [https://arxiv.org/abs/2512.12476 paper]
