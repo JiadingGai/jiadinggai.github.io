@@ -5,7 +5,7 @@ Selected research publications and public research artifacts.
 
 == Recent Publications
 
-- *Optimizing CUDA like a Human: Micro-Profiling Tools as Expert Surrogates for LLM-Based GPU Kernel Optimization.* Jiading Gai, Shuai Zhang, Kaj Bostrom, Jin Huang, Vihang Patil, Haoyang Fang, Bernie Wang, Huzefa Rangwala, and George Karypis. Submitted to Transactions on Machine Learning Research, 2026. [https://arxiv.org/abs/2606.26453 paper] [https://arxiv.org/pdf/2606.26453 pdf] [https://jiadinggai.github.io/assets/files/kernelpro-tmlr-supplement.zip supplement]
+- *Optimizing CUDA like a Human: Micro-Profiling Tools as Expert Surrogates for LLM-Based GPU Kernel Optimization.* Jiading Gai, Shuai Zhang, Kaj Bostrom, Jin Huang, Vihang Patil, Haoyang Fang, Bernie Wang, Huzefa Rangwala, and George Karypis. Submitted to Transactions on Machine Learning Research, 2026. [https://arxiv.org/abs/2606.26453 paper] [https://jiadinggai.github.io/assets/files/kernelpro-tmlr-supplement.zip supplement]
 
 - *DualKV: Shared-Prompt Flash Attention for Efficient RL Training with Large Rollouts and Long Contexts.* Jiading Gai, Shuai Zhang, Xiang Song, Bernie Wang, and George Karypis. arXiv preprint, 2026. [https://arxiv.org/abs/2605.15422 paper] [https://arxiv.org/pdf/2605.15422 pdf] [https://github.com/amazon-science/dualkv-flash-attn-for-rl code]
 
