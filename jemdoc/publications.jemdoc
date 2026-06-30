@@ -11,6 +11,8 @@ Selected research publications and public research artifacts.
 
 - *HetRL: Efficient Reinforcement Learning for LLMs in Heterogeneous Environments.* Yongjun He, Shuai Zhang, Jiading Gai, Xiyuan Zhang, Boran Han, Bernie Wang, Huzefa Rangwala, and George Karypis. Proceedings of Machine Learning and Systems, 2026. MLSys 2026 Oral. [https://arxiv.org/abs/2512.12476 paper]
 
+- *LLMZero: Discovering Adaptive Training Strategies for RL Post-Training via LLM Agents.* Haoyang Fang, Wei Zhu, Boran Han, Alex Zhang, Zhenyu Pan, Shuo Yang, Shuai Zhang, Jiading Gai, Peng Tang, Cuixiong Hu, Xuan Zhu, Huzefa Rangwala, George Karypis, and Bernie Wang. arXiv preprint, 2026. [https://arxiv.org/abs/2606.18388 paper]
+
 == Earlier Work
 
 - *Optimizing Memory-Access Patterns for Deep Learning Accelerators.* Hongbin Zheng, Sejong Oh, Huiqing Wang, Preston Briggs, Jiading Gai, Animesh Jain, Yizhi Liu, Rich Heaton, Randy Huang, and Yida Wang. 2nd Compilers for Machine Learning Workshop, CGO, 2020. [https://arxiv.org/abs/2002.12798 paper]
