@@ -25,6 +25,7 @@ PAGES = [
     ("jemdoc/projects.jemdoc", "projects/index.html"),
     ("jemdoc/patents.jemdoc", "patents/index.html"),
     ("jemdoc/blog.jemdoc", "blog/index.html"),
+    ("jemdoc/bpftrace-uprobe-stack.jemdoc", "blog/2026/bpftrace-uprobe-stack/index.html"),
     ("jemdoc/mytransformers.jemdoc", "blog/2026/mytransformers/index.html"),
     ("jemdoc/404.jemdoc", "404.html"),
 ]
@@ -35,6 +36,7 @@ ACTIVE_LINK = {
     "projects/index.html": "../projects/index.html",
     "patents/index.html": "../patents/index.html",
     "blog/index.html": "../blog/index.html",
+    "blog/2026/bpftrace-uprobe-stack/index.html": "../../../blog/index.html",
     "blog/2026/mytransformers/index.html": "../../../blog/index.html",
     "404.html": "404.html",
 }

@@ -1,0 +1,58 @@
+# jemdoc: menu{jemdoc/MENU}{blog/2026/bpftrace-uprobe-stack/index.html}{../../../}
+# jemdoc: nofooter
+= Confirming Native Function Calls with bpftrace
+A personal note on using Linux uprobes and stack traces to prove a native symbol is actually executed.
+
+~
+{}{raw}
+<p>Problem: a Python-level path says a custom CUDA or C++ extension should run, but I want kernel-level proof that a particular native function is entered. Sampling tools such as <code>py-spy</code> can miss short calls; a userspace probe on the native symbol counts every function entry.</p>
+
+<h2>Recipe</h2>
+
+<p>First, find the symbol exported by the extension shared object. C++ names may be mangled, so keep the exact symbol that appears in the binary.</p>
+
+<pre><code class="language-bash">readelf -Ws &lt;extension.so&gt; | grep dualkv_varlen_fwd
+
+# Alternative, with demangling for readability:
+nm -D --defined-only &lt;extension.so&gt; | c++filt | grep dualkv_varlen_fwd</code></pre>
+
+<p>Attach a <code>bpftrace</code> uprobe to the symbol and count calls. This fires on every entry to the function.</p>
+
+<pre><code class="language-bash">sudo bpftrace -e '
+uprobe:/path/to/flash_attn_2_cuda.so:_ZN5Flash21mha_dualkv_varlen_fwdE... {
+  @dualkv_fwd = count();
+}
+
+interval:s:20 {
+  print(@dualkv_fwd);
+}'</code></pre>
+
+<p>To confirm the calling path, aggregate user-space stack traces at the probe point.</p>
+
+<pre><code class="language-bash">sudo bpftrace -e '
+uprobe:/path/to/flash_attn_2_cuda.so:_ZN5Flash21mha_dualkv_varlen_fwdE... {
+  @[ustack()] = count();
+}
+
+interval:s:20 {
+  print(@);
+  clear(@);
+}'</code></pre>
+
+<h2>Interpretation</h2>
+
+<p>If the counter grows while the workload runs, the native symbol is being executed. In my DualKV check, the uprobe count climbed to 12,914 calls over roughly 60 seconds, which was stronger evidence than config checks or sampling traces.</p>
+
+<p>The stack-trace form answers the follow-up question: not only did the function run, but which user-space path reached it. This is the reusable trick when a Python binding, dispatcher, or CUDA extension makes the actual execution path hard to see.</p>
+
+<h2>Fallback</h2>
+
+<p>If <code>bpftrace</code> is unavailable, <code>perf probe</code> can attach to the same shared-object symbol.</p>
+
+<pre><code class="language-bash">sudo perf probe -x &lt;extension.so&gt; dualkv_varlen_fwd
+sudo perf stat -e 'probe_*:dualkv_varlen_fwd' -p &lt;pid&gt;</code></pre>
+
+<h2>Gotchas</h2>
+
+<p>Use the mangled symbol when needed. The process must have the shared object mapped, and probing usually needs <code>sudo</code> or <code>CAP_BPF</code>. Stack quality depends on frame pointers, unwind information, and symbol visibility. Inlined functions are not good probe targets.</p>
+~

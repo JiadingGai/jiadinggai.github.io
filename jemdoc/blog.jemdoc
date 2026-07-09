@@ -5,4 +5,5 @@ Short technical notes.
 
 == Posts
 
+- Jul. 9, 2026: [2026/bpftrace-uprobe-stack/index.html Confirming Native Function Calls with bpftrace]. A reminder note for proving a native CUDA extension function is entered with uprobes and stack traces.
 - Jun. 16, 2026: [2026/mytransformers/index.html Transformer MT System: Core Math]. Core Transformer math for a small German-to-English MT exercise.
