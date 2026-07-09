@@ -33,23 +33,47 @@ window.MathJax = {
 <td id="layout-content">
 <div id="toptitle">
 <h1>Confirming Native Function Calls with bpftrace</h1>
-<div id="subtitle">A personal note on using Linux uprobes and stack traces to prove a native symbol is actually executed.
+<div id="subtitle">Using Linux uprobes and stack traces to prove a native symbol is actually executed.
 </div>
 </div>
-<p>Problem: a Python-level path says a custom CUDA or C++ extension should run, but I want kernel-level proof that a particular native function is entered. Sampling tools such as <code>py-spy</code> can miss short calls; a userspace probe on the native symbol counts every function entry.</p>
+<p>Problem: a Python-level path says a custom CUDA or C++ extension should run, but I want kernel-level proof
+that a particular native function is entered. Sampling tools such as <code>py-spy</code> can miss short calls;
+a userspace probe on the native symbol counts every function entry.</p>
+
+<p>Here, <a href="https://github.com/amazon-science/dualkv-flash-attn-for-rl">
+<code>dualkv_varlen_fwd</code></a> is DualKV's variable-length forward FlashAttention path. DualKV shares a
+prompt across multiple rollout responses; tracing its compiled C++/CUDA symbol proves that the workload is
+actually dispatching the optimized path.</p>
+
+<h2>bpftrace Primer</h2>
+
+<p><code>bpftrace</code> compiles a short tracing script to eBPF. This note uses four concepts:</p>
+<ul>
+<li><code>uprobe:library:symbol</code> fires when a process enters a user-space function in a shared
+object.</li>
+<li><code>-p PID</code> limits that uprobe to the target Linux process.</li>
+<li><code>@map = count()</code> aggregates probe hits without printing every event.</li>
+<li><code>ustack()</code> makes a user-space stack trace the map key. <code>interval:s:20</code> prints
+it, and <code>clear(@)</code> starts the next reporting window.</li>
+</ul>
 
 <h2>Recipe</h2>
 
-<p>First, find the symbol exported by the extension shared object. C++ names may be mangled, so keep the exact symbol that appears in the binary.</p>
+<p>First, find the native symbol exported by the extension shared object. The Python entry point
+<code>flash_attn_dualkv_varlen_func</code> calls <code>flash_attn_2_cuda.dualkv_varlen_fwd</code>,
+which is bound to <code>Flash::mha_dualkv_varlen_fwd</code>. Get the exact mangled name:</p>
 
 <pre><code class="language-bash">readelf -Ws &lt;extension.so&gt; | grep dualkv_varlen_fwd
+# Example result: _ZN5Flash21mha_dualkv_varlen_fwdE...
 
 # Alternative, with demangling for readability:
 nm -D --defined-only &lt;extension.so&gt; | c++filt | grep dualkv_varlen_fwd</code></pre>
 
-<p>Attach a <code>bpftrace</code> uprobe to the symbol and count calls. This fires on every entry to the function.</p>
+<p>Attach a <code>bpftrace</code> uprobe to the symbol and count calls. This userspace probe requires
+<code>sudo</code> or <code>CAP_BPF</code> and fires on every function entry.</p>
 
-<pre><code class="language-bash">sudo bpftrace -e '
+<pre><code class="language-bash">PID=&lt;target-pid&gt;
+sudo bpftrace -p "$PID" -e '
 uprobe:/path/to/flash_attn_2_cuda.so:_ZN5Flash21mha_dualkv_varlen_fwdE... {
   @dualkv_fwd = count();
 }
@@ -60,7 +84,8 @@ interval:s:20 {
 
 <p>To confirm the calling path, aggregate user-space stack traces at the probe point.</p>
 
-<pre><code class="language-bash">sudo bpftrace -e '
+<pre><code class="language-bash">PID=&lt;target-pid&gt;
+sudo bpftrace -p "$PID" -e '
 uprobe:/path/to/flash_attn_2_cuda.so:_ZN5Flash21mha_dualkv_varlen_fwdE... {
   @[ustack()] = count();
 }
@@ -72,9 +97,14 @@ interval:s:20 {
 
 <h2>Interpretation</h2>
 
-<p>If the counter grows while the workload runs, the native symbol is being executed. In my DualKV check, the uprobe count climbed to 12,914 calls over roughly 60 seconds, which was stronger evidence than config checks or sampling traces.</p>
+<p>For this DualKV check, the correct eBPF uprobe on the native
+<code>Flash::mha_dualkv_varlen_fwd</code> symbol reported 12,914 calls over roughly 60 seconds. That is
+direct evidence that this workload dispatched the optimized path, rather than merely being configured for it;
+the exact count will vary with the workload.</p>
 
-<p>The stack-trace form answers the follow-up question: not only did the function run, but which user-space path reached it. This is the reusable trick when a Python binding, dispatcher, or CUDA extension makes the actual execution path hard to see.</p>
+<p>The stack-trace form answers the follow-up question: not only did the function run, but which user-space
+path reached it. This is the reusable trick when a Python binding, dispatcher, or CUDA extension makes the
+actual execution path hard to see.</p>
 
 <h2>Fallback</h2>
 
@@ -85,7 +115,15 @@ sudo perf stat -e 'probe_*:dualkv_varlen_fwd' -p &lt;pid&gt;</code></pre>
 
 <h2>Gotchas</h2>
 
-<p>Use the mangled symbol when needed. The process must have the shared object mapped, and probing usually needs <code>sudo</code> or <code>CAP_BPF</code>. Stack quality depends on frame pointers, unwind information, and symbol visibility. Inlined functions are not good probe targets.</p>
+<p>Use the mangled symbol when needed. The process must have the shared object mapped, and probing usually
+needs <code>sudo</code> or <code>CAP_BPF</code>. Stack quality depends on frame pointers, unwind information,
+and symbol visibility. Inlined functions are not good probe targets.</p>
+
+<h2>References</h2>
+
+<ul>
+<li><a href="https://bpftrace.org/docs/release_025/cli">bpftrace CLI reference (v0.25)</a></li>
+</ul>
 </td>
 </tr>
 </table>
