@@ -9,10 +9,13 @@ Using Linux uprobes and stack traces to prove a native symbol is actually execut
 that a particular native function is entered. Sampling tools such as <code>py-spy</code> can miss short calls;
 a userspace probe on the native symbol counts every function entry.</p>
 
-<p>Here, <a href="https://github.com/amazon-science/dualkv-flash-attn-for-rl">
-<code>dualkv_varlen_fwd</code></a> is DualKV's variable-length forward FlashAttention path. DualKV shares a
-prompt across multiple rollout responses; tracing its compiled C++/CUDA symbol proves that the workload is
-actually dispatching the optimized path.</p>
+<p>Here I use <code>dualkv_varlen_fwd</code> from
+<a href="https://github.com/amazon-science/dualkv-flash-attn-for-rl">my DualKV FlashAttention code release</a>
+as a concrete example. DualKV adds custom FlashAttention CUDA kernels and a native entry point,
+<code>Flash::mha_dualkv_varlen_fwd</code>, exposed to Python as <code>dualkv_varlen_fwd</code>. This
+variable-length path shares a prompt across multiple rollout responses. <code>bpftrace</code> probes that
+host-side function to show that the runtime reaches the DualKV implementation; CUDA tracing is needed to
+observe subsequent GPU-kernel execution.</p>
 
 <h2>bpftrace Primer</h2>
 
