@@ -18,6 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 JEMDOC = os.environ.get("JEMDOC", "jemdoc")
 CONF = ROOT / "jemdoc" / "site.conf"
+SITE_URL = "https://jiadinggai.github.io"
 
 PAGES = [
     ("jemdoc/index.jemdoc", "index.html"),
@@ -54,6 +55,24 @@ def postprocess_html(path: Path, output: str) -> None:
     path.write_text(html)
 
 
+def write_sitemap() -> None:
+    urls = []
+    for _, output in PAGES:
+        if output == "404.html":
+            continue
+        suffix = "" if output == "index.html" else output.removesuffix("index.html")
+        urls.append(f"{SITE_URL}/{suffix}")
+
+    entries = "\n".join(f"  <url><loc>{url}</loc></url>" for url in urls)
+    sitemap = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{entries}\n"
+        "</urlset>\n"
+    )
+    (ROOT / "sitemap.xml").write_text(sitemap)
+
+
 def main() -> int:
     env = os.environ.copy()
     env.setdefault("PYTHONWARNINGS", "ignore::SyntaxWarning")
@@ -67,6 +86,7 @@ def main() -> int:
         print(" ".join(cmd))
         subprocess.run(cmd, cwd=ROOT, check=True, env=env)
         postprocess_html(output_path, output)
+    write_sitemap()
     return 0
 
 
