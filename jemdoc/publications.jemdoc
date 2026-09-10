@@ -5,13 +5,17 @@ Selected research publications and public research artifacts.
 
 == Recent Publications
 
+- *Learning Exact NVIDIA SASS Encoders with $\mathbb{F}_2$ Linear Algebra.* Jiading Gai. arXiv preprint, 2026. [https://arxiv.org/pdf/2608.20532 paper] / [https://github.com/JiadingGai/f2asm project]
+
 - *Optimizing CUDA like a Human: Micro-Profiling Tools as Expert Surrogates for LLM-Based GPU Kernel Optimization.* Jiading Gai, Shuai Zhang, Kaj Bostrom, Jin Huang, Vihang Patil, Haoyang Fang, Bernie Wang, Huzefa Rangwala, and George Karypis. arXiv preprint, 2026. Under review. [https://arxiv.org/abs/2606.26453 paper] / [https://jiadinggai.github.io/assets/files/kernelpro-tmlr-supplement.zip Supplementary Material]
 
 - *DualKV: Shared-Prompt Flash Attention for Efficient RL Training with Large Rollouts and Long Contexts.* Jiading Gai, Shuai Zhang, Xiang Song, Bernie Wang, and George Karypis. arXiv preprint, 2026. [https://arxiv.org/abs/2605.15422 paper] / [https://github.com/amazon-science/dualkv-flash-attn-for-rl code]
 
 - *HetRL: Efficient Reinforcement Learning for LLMs in Heterogeneous Environments.* Yongjun He, Shuai Zhang, Jiading Gai, Xiyuan Zhang, Boran Han, Bernie Wang, Huzefa Rangwala, and George Karypis. Proceedings of Machine Learning and Systems, 2026. MLSys 2026 Oral. [https://arxiv.org/abs/2512.12476 paper]
 
-- *LLMZero: Discovering Adaptive Training Strategies for RL Post-Training via LLM Agents.* Haoyang Fang, Wei Zhu, Boran Han, Alex Zhang, Zhenyu Pan, Shuo Yang, Shuai Zhang, Jiading Gai, Peng Tang, Cuixiong Hu, Xuan Zhu, Huzefa Rangwala, George Karypis, and Bernie Wang. arXiv preprint, 2026. [https://arxiv.org/abs/2606.18388 paper]
+- *LLMZERO: Discovering Adaptive Training Strategies for RL Post-Training via LLM Agents.* Haoyang Fang, Wei Zhu, Boran Han, Zhenyu Pan, Shuo Yang, Shuai Zhang, Jiading Gai, Peng Tang, Cuixiong Hu, Huzefa Rangwala, George Karypis, and Bernie Wang. EMNLP 2026. [https://arxiv.org/abs/2606.18388 paper] / [https://openreview.net/forum?id=tu5IOfr2lf OpenReview]
+
+- *Mitra-v2 Technical Report.* Yefan Tao, Xiyuan Zhang, Xinyi Liu, Boran Han, Danielle Maddix, Haoyang Fang, Zhen Han, Jiading Gai, Xuanqing Liu, Michael Bohlke-Schneider, Yuyang (Bernie) Wang, Gerald Friedland, Kevan Mah, Chris Lee, and Chris Kong. arXiv preprint, 2026. [https://arxiv.org/abs/2609.04540 paper] / [https://huggingface.co/autogluon/mitra-finetune code and models]
 
 == Earlier Work
 

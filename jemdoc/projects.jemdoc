@@ -3,6 +3,16 @@
 = Projects
 Selected research and engineering projects.
 
+== F2Asm
+
+Exact NVIDIA SASS instruction encoding learned with binary linear algebra.
+
+F2Asm learns 128-bit SASS encoders as vector-valued affine maps over $\mathbb{F}_2$. Streaming Gaussian elimination builds compact bases, detects inconsistent evidence, and rejects instructions outside the learned span.
+
+The system performs byte-exact CUBIN reconstruction across Hopper, Blackwell, and Rubin. Its public repository currently hosts the project page while the source release is prepared.
+
+[https://arxiv.org/pdf/2608.20532 paper] / [https://github.com/JiadingGai/f2asm project]
+
 == DualKV
 
 Shared-prompt FlashAttention for efficient RL training with large rollouts and long contexts.
@@ -11,7 +21,7 @@ DualKV removes redundant shared-prompt attention work in large-rollout RL traini
 
 The project targets long-context, many-rollout training regimes where the prompt is shared but completions diverge. The result is better policy-update throughput and lower wasted computation while keeping exact attention semantics.
 
-[https://arxiv.org/abs/2605.15422 paper] [https://github.com/amazon-science/dualkv-flash-attn-for-rl code]
+[https://arxiv.org/abs/2605.15422 paper] / [https://github.com/amazon-science/dualkv-flash-attn-for-rl code]
 
 == Multi-Agent CUDA Kernel Optimizer
 

@@ -21,9 +21,9 @@ Senior Applied Scientist, AWS Bedrock DS3 and AWS AI Labs
 
 == Current Highlights
 
+- *F2Asm exact SASS encoding.* Learned 128-bit NVIDIA SASS encoders as affine maps over $\mathbb{F}_2$, with byte-exact CUBIN reconstruction across Hopper, Blackwell, and Rubin GPUs.
 - *DualKV shared-prompt FlashAttention.* Designed and implemented a CUDA forward/backward kernel and veRL data-pipeline redesign for large-rollout RL training.
 - *Multi-agent CUDA kernel optimizer.* Built a kernel optimization framework using bottleneck analyzers for occupancy, memory behavior, SASS, NCU, roofline, and Hopper WGMMA/TMA diagnosis.
-- *Compiler and accelerator systems.* Developed compiler transformations, scheduling optimizations, and backend code-generation improvements for AI accelerator workloads.
 
 == Public Impact
 
@@ -34,6 +34,9 @@ Senior Applied Scientist, AWS Bedrock DS3 and AWS AI Labs
 
 == News
 
+- Sep. 9, 2026: LLMZero was accepted to EMNLP 2026.
+- Sep. 3, 2026: Mitra-v2 was released as an arXiv preprint with public model and code artifacts.
+- Aug. 20, 2026: F2Asm was released as an arXiv preprint.
 - Jun. 24, 2026: KernelPro was released as an arXiv preprint.
 - Jun. 16, 2026: HetRL was accepted as an oral presentation at MLSys 2026.
 - May 20, 2026: DualKV was released as an arXiv preprint.
@@ -41,6 +44,8 @@ Senior Applied Scientist, AWS Bedrock DS3 and AWS AI Labs
 
 == Recent Publications
 
+- *Learning Exact NVIDIA SASS Encoders with $\mathbb{F}_2$ Linear Algebra.* Jiading Gai. arXiv preprint, 2026. [https://arxiv.org/pdf/2608.20532 paper] / [https://github.com/JiadingGai/f2asm project]
 - *Optimizing CUDA like a Human: Micro-Profiling Tools as Expert Surrogates for LLM-Based GPU Kernel Optimization.* Jiading Gai, Shuai Zhang, Kaj Bostrom, Jin Huang, Vihang Patil, Haoyang Fang, Bernie Wang, Huzefa Rangwala, and George Karypis. arXiv preprint, 2026. Under review. [https://arxiv.org/abs/2606.26453 paper] / [https://jiadinggai.github.io/assets/files/kernelpro-tmlr-supplement.zip Supplementary Material]
 - *DualKV: Shared-Prompt Flash Attention for Efficient RL Training with Large Rollouts and Long Contexts.* Jiading Gai, Shuai Zhang, Xiang Song, Bernie Wang, and George Karypis. arXiv preprint, 2026. [https://arxiv.org/abs/2605.15422 paper] / [https://github.com/amazon-science/dualkv-flash-attn-for-rl code]
 - *HetRL: Efficient Reinforcement Learning for LLMs in Heterogeneous Environments.* Yongjun He, Shuai Zhang, Jiading Gai, Xiyuan Zhang, Boran Han, Bernie Wang, Huzefa Rangwala, and George Karypis. Proceedings of Machine Learning and Systems, 2026. MLSys 2026 Oral. [https://arxiv.org/abs/2512.12476 paper]
+- *Mitra-v2 Technical Report.* Yefan Tao, Xiyuan Zhang, Xinyi Liu, Boran Han, Danielle Maddix, Haoyang Fang, Zhen Han, Jiading Gai, Xuanqing Liu, Michael Bohlke-Schneider, Yuyang (Bernie) Wang, Gerald Friedland, Kevan Mah, Chris Lee, and Chris Kong. arXiv preprint, 2026. [https://arxiv.org/abs/2609.04540 paper] / [https://huggingface.co/autogluon/mitra-finetune code and models]
