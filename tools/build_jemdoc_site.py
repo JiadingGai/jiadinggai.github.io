@@ -12,6 +12,7 @@ import os
 import re
 import subprocess
 import sys
+from html import escape
 from pathlib import Path
 
 
@@ -43,8 +44,53 @@ ACTIVE_LINK = {
 }
 
 
+PAGE_DESCRIPTIONS = {
+    "index.html": (
+        "Jiading Gai's research, publications, and technical notes on GPU systems, CUDA kernels, "
+        "compiler engineering, and efficient machine learning."
+    ),
+    "publications/index.html": (
+        "Research publications by Jiading Gai and coauthors on GPU systems, "
+        "machine learning, reinforcement learning, and high-performance computing."
+    ),
+    "projects/index.html": (
+        "Jiading Gai's research projects: F2Asm NVIDIA SASS encoders, DualKV FlashAttention, "
+        "CUDA kernel optimization, and IMPATIENT MRI."
+    ),
+    "patents/index.html": "Patents and patent applications coauthored by Jiading Gai.",
+    "blog/index.html": (
+        "Technical articles by Jiading Gai on GPU systems, native function tracing, "
+        "and Transformer machine translation."
+    ),
+    "blog/2026/bpftrace-uprobe-stack/index.html": (
+        "Confirm native function calls with bpftrace uprobes, process filtering, "
+        "call counts, and user-space stack traces, using DualKV as an example."
+    ),
+    "blog/2026/mytransformers/index.html": (
+        "Transformer machine translation in PyTorch: attention, encoder-decoder interaction, "
+        "training, and BLEU, with equations and code."
+    ),
+    "404.html": "The requested page could not be found on Jiading Gai's website.",
+}
+
+
+def canonical_url(output: str) -> str:
+    return f"{SITE_URL}/{output.removesuffix('index.html')}"
+
+
 def postprocess_html(path: Path, output: str) -> None:
     html = path.read_text()
+    marker = "<!-- SEARCH_METADATA -->"
+    if html.count(marker) != 1:
+        raise ValueError(f"Expected one search metadata placeholder in {output}")
+    metadata = f'<meta name="description" content="{escape(PAGE_DESCRIPTIONS[output])}" />'
+    if output == "404.html":
+        metadata += '\n<meta name="robots" content="noindex" />'
+    else:
+        metadata += f'\n<link rel="canonical" href="{escape(canonical_url(output))}" />'
+    html = html.replace(marker, metadata)
+    if output != "index.html":
+        html = re.sub(r"(<title>.*?)(</title>)", r"\1 | Jiading Gai\2", html, count=1)
     html = html.replace('target=&ldquo;blank&rdquo;', 'target="_blank"')
     html = html.replace('target="blank"', 'target="_blank"')
     html = re.sub(r'(<a href="(?!https?://)[^"]+") target="_blank"', r"\1", html)
@@ -60,8 +106,7 @@ def write_sitemap() -> None:
     for _, output in PAGES:
         if output == "404.html":
             continue
-        suffix = "" if output == "index.html" else output.removesuffix("index.html")
-        urls.append(f"{SITE_URL}/{suffix}")
+        urls.append(canonical_url(output))
 
     entries = "\n".join(f"  <url><loc>{url}</loc></url>" for url in urls)
     sitemap = (
