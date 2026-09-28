@@ -9,13 +9,15 @@ Exact NVIDIA SASS instruction encoding learned with binary linear algebra.
 
 F2Asm learns 128-bit SASS encoders as vector-valued affine maps over $\mathbb{F}_2$. Streaming Gaussian elimination builds compact bases, detects inconsistent evidence, and rejects instructions outside the learned span.
 
-The system performs byte-exact CUBIN reconstruction across Hopper, Blackwell, and Rubin. Its public repository currently hosts the project page while the source release is prepared.
+The system performs byte-exact CUBIN reconstruction across Hopper, Blackwell, and Rubin. Its public repository hosts the implementation and supporting artifacts.
 
-[https://arxiv.org/pdf/2608.20532 paper] / [https://github.com/JiadingGai/f2asm project]
+[https://arxiv.org/pdf/2608.20532 paper] / [https://github.com/JiadingGai/f2asm code]
 
 == DualKV
 
 Shared-prompt FlashAttention for efficient RL training with large rollouts and long contexts.
+
+Accepted to NeurIPS 2026.
 
 DualKV removes redundant shared-prompt attention work in large-rollout RL training by combining a FlashAttention-style CUDA forward and backward kernel with a veRL data-pipeline redesign.
 
