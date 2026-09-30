@@ -11,6 +11,7 @@ _site
 __pycache__/
 assets/libs/
 assets/rendercv/rendercv_output/*.typ
+assets/files/kernelpro-tmlr-supplement.zip
 al-folio-upgrade-report.md
 node_modules/
 output/playwright/
