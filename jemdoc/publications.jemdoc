@@ -13,7 +13,7 @@ Selected research publications and public research artifacts.
 
 - *HetRL: Efficient Reinforcement Learning for LLMs in Heterogeneous Environments.* Yongjun He, Shuai Zhang, Jiading Gai, Xiyuan Zhang, Boran Han, Bernie Wang, Huzefa Rangwala, and George Karypis. Proceedings of Machine Learning and Systems, 2026. MLSys 2026 Oral. [https://arxiv.org/abs/2512.12476 paper]
 
-- *LLMZERO: Discovering Adaptive Training Strategies for RL Post-Training via LLM Agents.* Haoyang Fang, Wei Zhu, Boran Han, Zhenyu Pan, Shuo Yang, Shuai Zhang, Jiading Gai, Peng Tang, Cuixiong Hu, Huzefa Rangwala, George Karypis, and Bernie Wang. EMNLP 2026. [https://arxiv.org/abs/2606.18388 paper] / [https://openreview.net/forum?id=tu5IOfr2lf OpenReview]
+- *LLMZero: Discovering Adaptive Training Strategies for RL Post-Training via LLM Agents.* Haoyang Fang, Wei Zhu, Boran Han, Alex Zhang, Zhenyu Pan, Shuo Yang, Shuai Zhang, Jiading Gai, Peng Tang, Cuixiong Hu, Xuan Zhu, Huzefa Rangwala, George Karypis, and Bernie Wang. Findings of EMNLP 2026. [https://arxiv.org/abs/2606.18388 paper] / [https://openreview.net/forum?id=tu5IOfr2lf OpenReview]
 
 - *Mitra-v2 Technical Report.* Yefan Tao, Xiyuan Zhang, Xinyi Liu, Boran Han, Danielle Maddix, Haoyang Fang, Zhen Han, Jiading Gai, Xuanqing Liu, Michael Bohlke-Schneider, Yuyang (Bernie) Wang, Gerald Friedland, Kevan Mah, Chris Lee, and Chris Kong. arXiv preprint, 2026. [https://arxiv.org/abs/2609.04540 paper] / [https://huggingface.co/autogluon/mitra-finetune code and models]
 
@@ -30,7 +30,7 @@ Selected research publications and public research artifacts.
 
 - *Fast Construction of Nanosecond Level Snapshots of Financial Markets.* Jiading Gai, Dong Ju Choi, David O'Neal, Mao Ye, and Robert S. Sinkovits. Proceedings of XSEDE, 2013. [https://doi.org/10.1145/2484762.2484825 doi]
 
-- *More IMPATIENT: A Gridding-Accelerated Toeplitz-Based Strategy for Non-Cartesian High-Resolution 3D MRI on GPUs.* Jiading Gai, Nabil Obeid, Joseph L. Holtrop, Xiaodong Wu, Freddy Lam, Matt Fu, Justin P. Haldar, Zhizhou Wen, Wen-Mei W. Hwu, Zhi-Pei Liang, and Bradley P. Sutton. Journal of Parallel and Distributed Computing, 2013. [https://doi.org/10.1016/j.jpdc.2013.01.001 doi]
+- *More IMPATIENT: A Gridding-Accelerated Toeplitz-Based Strategy for Non-Cartesian High-Resolution 3D MRI on GPUs.* Jiading Gai, Nady Obeid, Joseph L. Holtrop, Xiaolong Wu, Fan Lam, Maojing Fu, Justin P. Haldar, Wen-mei W. Hwu, Zhi-Pei Liang, and Bradley P. Sutton. Journal of Parallel and Distributed Computing, 2013. [https://doi.org/10.1016/j.jpdc.2013.01.001 doi]
 
 - *Robust Contour Tracking Based on a Coupling Between Geodesic Active Contours and Conditional Random Fields.* Jiading Gai and Robert Stevenson. Journal of Visual Communication and Image Representation, 2011. [https://doi.org/10.1016/j.jvcir.2010.10.001 doi]
 
