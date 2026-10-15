@@ -4,7 +4,7 @@
 <meta name="generator" content="jemdoc+MathJax, see https://github.com/wsshin/jemdoc_mathjax" />
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="description" content="Jiading Gai&#x27;s research projects: F2Asm NVIDIA SASS encoders, DualKV FlashAttention, CUDA kernel optimization, and IMPATIENT MRI." />
+<meta name="description" content="Jiading Gai&#x27;s research projects: F2Asm NVIDIA SASS encoders, DualKV FlashAttention, AMMO and CUDA kernel optimization, and IMPATIENT MRI." />
 <link rel="canonical" href="https://jiadinggai.github.io/projects/" />
 <link rel="icon" type="image/svg+xml" href="/assets/img/church-lambda-icon.svg" />
 <link rel="stylesheet" href="/assets/css/jemdoc.css" type="text/css" />
@@ -40,11 +40,11 @@ window.MathJax = {
 <h2>F2Asm</h2>
 <p>Exact NVIDIA SASS instruction encoding learned with binary linear algebra.
 </p>
-<p>F2Asm learns 128-bit SASS encoders as vector-valued affine maps over \(\mathbb{F}_2\). Streaming Gaussian elimination builds compact bases, detects inconsistent evidence, and rejects instructions outside the learned span.
+<p>F2Asm learns 128-bit SASS encoders as vector-valued affine maps over \(\mathbb{F}_2\). Streaming Gaussian elimination builds compact bases, detects inconsistent evidence, and rejects instructions outside the learned span. Its encoders are trained from 3,225 CUBINs.
 </p>
-<p>The system performs byte-exact CUBIN reconstruction across Hopper, Blackwell, and Rubin. Its public repository hosts the implementation and supporting artifacts.
+<p>The system performs byte-exact CUBIN reconstruction across Hopper, Blackwell, and Rubin. It is the first open-source NVIDIA SASS assembler to support Rubin SM107.
 </p>
-<p><a href="https://arxiv.org/pdf/2608.20532" target="_blank">paper</a> / <a href="https://github.com/JiadingGai/f2asm" target="_blank">code</a>
+<p><a href="https://arxiv.org/abs/2608.20532" target="_blank">paper</a> / <a href="https://github.com/JiadingGai/f2asm" target="_blank">code</a>
 </p>
 <h2>DualKV</h2>
 <p>Shared-prompt FlashAttention for efficient RL training with large rollouts and long contexts.
@@ -55,7 +55,7 @@ window.MathJax = {
 </p>
 <p>The project targets long-context, many-rollout training regimes where the prompt is shared but completions diverge. The result is better policy-update throughput and lower wasted computation while keeping exact attention semantics.
 </p>
-<p><a href="https://arxiv.org/abs/2605.15422" target="_blank">paper</a> / <a href="https://github.com/amazon-science/dualkv-flash-attn-for-rl" target="_blank">code</a>
+<p><a href="https://arxiv.org/abs/2605.15422" target="_blank">paper</a>, <a href="https://neurips.cc/virtual/2026/poster/148696" target="_blank">NeurIPS</a>, and <a href="https://github.com/amazon-science/dualkv-flash-attn-for-rl" target="_blank">code</a>
 </p>
 <h2>Multi-Agent CUDA Kernel Optimizer</h2>
 <p>Bottleneck-analyzer agents for CUDA diagnosis and optimization.
@@ -63,6 +63,13 @@ window.MathJax = {
 <p>This project builds a multi-agent framework for autonomous CUDA kernel optimization. The key idea is to use bottleneck analyzers as expert surrogates that reason from occupancy, memory behavior, SASS, NCU metrics, roofline analysis, and Hopper WGMMA/TMA utilization.
 </p>
 <p>The framework was applied to kernel-benchmark tasks and production Hopper grouped-GEMM optimization work.
+</p>
+<h2>AMMO</h2>
+<p>Autonomous, deployment-specific GPU kernel optimization for vLLM.
+</p>
+<p>AMMO profiles a target model, hardware, data type, and parallelism configuration; proposes and debates kernel changes; validates correctness and performance; and retains only improvements that survive end-to-end measurement. Unattended campaigns run in isolated sessions and produce auditable optimization reports.
+</p>
+<p><a href="https://github.com/amazon-science/ammo" target="_blank">code</a>
 </p>
 <h2>IMPATIENT MRI</h2>
 <p>GPU-accelerated MRI reconstruction toolkit.

@@ -3,11 +3,12 @@
 = Patents
 Patents and invention disclosures.
 
-. [https://patents.justia.com/patent/12530178 US 12,530,178], "Matmult Packing," granted Jan. 2026. Industry-first matmul auto-vectorization for AI accelerators.
-. [https://patents.justia.com/patent/12400137 US 12,400,137], "Bidirectional Network on Data-Flow Processors," granted Aug. 2025.
-. [https://patents.justia.com/patent/12159218 US 12,159,218], "Dropout Layer in a Neural Network Processor," granted Dec. 2024.
+. [https://patents.google.com/patent/US12632693B1/en US 12,632,693 B1], "Matrix multiplication packing with instruction reordering," granted May 19, 2026.
+. [https://patents.google.com/patent/US12530178B1/en US 12,530,178 B1], "Tile assignment for matrix multiplication packing," granted Jan. 20, 2026.
+. [https://patents.google.com/patent/US12400137B1/en US 12,400,137 B1], "Bidirectional network on a data-flow centric processor," granted Aug. 26, 2025.
+. [https://patents.google.com/patent/US12159218B1/en US 12,159,218 B1], "Dropout layer in a neural network processor," granted Dec. 3, 2024.
 . P66029, "Tensor Alignment during Runtime on a Data Flow Centric Accelerator," filed 2019.
 . P61139, "Global Selection Guidance: Cross-border Product Recommendations," filed 2018.
-. [https://patents.google.com/patent/US10607228B1/en US 10,607,228 B1], "Dynamic Rule Strategy and Fraud Detection," granted 2017.
-. [https://patents.google.com/patent/US7623707B2/en US 7,623,707 B2], "Matte-Based Video Restoration," granted 2009.
-. [https://patents.google.com/patent/US7839406B2/en US 7,839,406 B2], "Methods and Systems for Setting a Backlight Level," granted 2010.
+. [https://patents.google.com/patent/US10607228B1/en US 10,607,228 B1], "Dynamic rule strategy and fraud detection system and method," granted Mar. 31, 2020.
+. [https://patents.google.com/patent/US8078002B2/en US 8,078,002 B2], "Matte-based video restoration," granted Dec. 13, 2011.
+. [https://patents.google.com/patent/US20100295864A1/en US 2010/0295864 A1], "Methods and Systems for Setting a Backlight Level," published Nov. 25, 2010.

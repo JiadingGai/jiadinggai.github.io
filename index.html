@@ -6,6 +6,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="description" content="Jiading Gai&#x27;s research, publications, and technical notes on GPU systems, CUDA kernels, compiler engineering, and efficient machine learning." />
 <link rel="canonical" href="https://jiadinggai.github.io/" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://jiadinggai.github.io/#website",
+      "url": "https://jiadinggai.github.io/",
+      "name": "Jiading Gai",
+      "publisher": {
+        "@id": "https://jiadinggai.github.io/#person"
+      }
+    },
+    {
+      "@type": "ProfilePage",
+      "@id": "https://jiadinggai.github.io/#profile",
+      "url": "https://jiadinggai.github.io/",
+      "name": "Jiading Gai",
+      "mainEntity": {
+        "@id": "https://jiadinggai.github.io/#person"
+      },
+      "isPartOf": {
+        "@id": "https://jiadinggai.github.io/#website"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://jiadinggai.github.io/#person",
+      "name": "Jiading Gai",
+      "url": "https://jiadinggai.github.io/",
+      "jobTitle": "Senior Applied Scientist",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Amazon Web Services"
+      },
+      "sameAs": [
+        "https://github.com/JiadingGai",
+        "https://scholar.google.com/citations?hl=en&user=B0OBVgsAAAAJ",
+        "https://dblp.org/pid/06/2795.html",
+        "https://www.amazon.science/author/jiading-gai"
+      ],
+      "knowsAbout": [
+        "CUDA",
+        "GPU systems",
+        "compiler engineering",
+        "machine learning systems",
+        "reinforcement learning"
+      ]
+    }
+  ]
+}
+</script>
 <link rel="icon" type="image/svg+xml" href="/assets/img/church-lambda-icon.svg" />
 <link rel="stylesheet" href="/assets/css/jemdoc.css" type="text/css" />
 <title>Jiading Gai</title>
@@ -51,7 +103,7 @@ window.MathJax = {
 </div>
 <h2>Current Highlights</h2>
 <ul>
-<li><p><b>F2Asm exact SASS encoding.</b> Learned 128-bit NVIDIA SASS encoders as affine maps over \(\mathbb{F}_2\), with byte-exact CUBIN reconstruction across Hopper, Blackwell, and Rubin GPUs.
+<li><p><b>F2Asm exact SASS assembly.</b> Learned 128-bit NVIDIA SASS encoders as affine maps over \(\mathbb{F}_2\) from 3,225 CUBINs, with byte-exact reconstruction across Hopper, Blackwell, and Rubin GPUs. The open-source assembler supports Rubin SM107.
 </p>
 </li>
 <li><p><b>DualKV shared-prompt FlashAttention.</b> Designed and implemented a CUDA forward/backward kernel and veRL data-pipeline redesign for large-rollout RL training.
@@ -65,6 +117,9 @@ window.MathJax = {
 <p>Our high-frequency trading research was cited in the U.S. Senate hearing <a href="https://www.congress.gov/112/chrg/CHRG-112shrg80168/CHRG-112shrg80168.pdf#page=38"><em>Computerized Trading: What Should the Rules of the Road Be?</em></a>.</p>
 <h2>News</h2>
 <ul>
+<li><p>Sep. 28, 2026: F2Asm v3 added shared Blackwell and Rubin encoders and expanded Rubin instruction coverage.
+</p>
+</li>
 <li><p>Sep. 24, 2026: DualKV was accepted to NeurIPS 2026.
 </p>
 </li>
@@ -77,6 +132,9 @@ window.MathJax = {
 <li><p>Aug. 20, 2026: F2Asm was released as an arXiv preprint.
 </p>
 </li>
+<li><p>Aug. 19, 2026: AMMO, a multi-agent system for autonomous vLLM kernel optimization, was released with code and reproducibility artifacts.
+</p>
+</li>
 <li><p>Jun. 24, 2026: KernelPro was released as an arXiv preprint.
 </p>
 </li>
@@ -86,22 +144,22 @@ window.MathJax = {
 <li><p>May 20, 2026: DualKV was released as an arXiv preprint.
 </p>
 </li>
-<li><p>Jan. 15, 2026: US 12,530,178, &ldquo;Matmult Packing,&rdquo; was granted.
-</p>
-</li>
 </ul>
 <h2>Recent Publications</h2>
 <ul>
-<li><p><b>Learning Exact NVIDIA SASS Encoders with \(\mathbb{F}_2\) Linear Algebra.</b> Jiading Gai. arXiv preprint, 2026. <a href="https://arxiv.org/pdf/2608.20532" target="_blank">paper</a> / <a href="https://github.com/JiadingGai/f2asm" target="_blank">code</a>
+<li><p><b>Learning Exact NVIDIA SASS Encoders with \(\mathbb{F}_2\) Linear Algebra.</b> Jiading Gai. arXiv preprint, 2026. <a href="https://arxiv.org/abs/2608.20532" target="_blank">paper</a> / <a href="https://github.com/JiadingGai/f2asm" target="_blank">code</a>
 </p>
 </li>
 <li><p><b>Optimizing CUDA like a Human: Micro-Profiling Tools as Expert Surrogates for LLM-Based GPU Kernel Optimization.</b> Jiading Gai, Shuai Zhang, Kaj Bostrom, Jin Huang, Vihang Patil, Haoyang Fang, Bernie Wang, Huzefa Rangwala, and George Karypis. arXiv preprint, 2026. <a href="https://arxiv.org/abs/2606.26453" target="_blank">paper</a>
 </p>
 </li>
-<li><p><b>DualKV: Shared-Prompt Flash Attention for Efficient RL Training with Large Rollouts and Long Contexts.</b> Jiading Gai, Shuai Zhang, Xiang Song, Bernie Wang, and George Karypis. NeurIPS 2026. <a href="https://arxiv.org/abs/2605.15422" target="_blank">paper</a> / <a href="https://github.com/amazon-science/dualkv-flash-attn-for-rl" target="_blank">code</a>
+<li><p><b>DualKV: Shared-Prompt Flash Attention for Efficient RL Training with Large Rollouts and Long Contexts.</b> Jiading Gai, Shuai Zhang, Xiang Song, Bernie Wang, and George Karypis. NeurIPS 2026. <a href="https://arxiv.org/abs/2605.15422" target="_blank">paper</a>, <a href="https://neurips.cc/virtual/2026/poster/148696" target="_blank">NeurIPS</a>, and <a href="https://github.com/amazon-science/dualkv-flash-attn-for-rl" target="_blank">code</a>
 </p>
 </li>
-<li><p><b>HetRL: Efficient Reinforcement Learning for LLMs in Heterogeneous Environments.</b> Yongjun He, Shuai Zhang, Jiading Gai, Xiyuan Zhang, Boran Han, Bernie Wang, Huzefa Rangwala, and George Karypis. Proceedings of Machine Learning and Systems, 2026. MLSys 2026 Oral. <a href="https://arxiv.org/abs/2512.12476" target="_blank">paper</a>
+<li><p><b>HetRL: Efficient Reinforcement Learning for LLMs in Heterogeneous Environments.</b> Yongjun He, Shuai Zhang, Jiading Gai, Xiyuan Zhang, Boran Han, Bernie Wang, Huzefa Rangwala, and George Karypis. Proceedings of Machine Learning and Systems, 2026. MLSys 2026 Oral. <a href="https://arxiv.org/abs/2512.12476" target="_blank">paper</a> / <a href="https://proceedings.mlsys.org/paper_files/paper/2026/hash/5321b1dabcd2be188d796c21b733e8c7-Abstract-Conference.html" target="_blank">proceedings</a>
+</p>
+</li>
+<li><p><b>LLMZero: Discovering Adaptive Training Strategies for RL Post-Training via LLM Agents.</b> Haoyang Fang, Wei Zhu, Boran Han, Alex Zhang, Zhenyu Pan, Shuo Yang, Shuai Zhang, Jiading Gai, Peng Tang, Cuixiong Hu, Xuan Zhu, Huzefa Rangwala, George Karypis, and Bernie Wang. Findings of EMNLP 2026. <a href="https://arxiv.org/abs/2606.18388" target="_blank">paper</a> / <a href="https://openreview.net/forum?id=tu5IOfr2lf" target="_blank">OpenReview</a>
 </p>
 </li>
 <li><p><b>Mitra-v2 Technical Report.</b> Yefan Tao, Xiyuan Zhang, Xinyi Liu, Boran Han, Danielle Maddix, Haoyang Fang, Zhen Han, Jiading Gai, Xuanqing Liu, Michael Bohlke-Schneider, Yuyang (Bernie) Wang, Gerald Friedland, Kevan Mah, Chris Lee, and Chris Kong. arXiv preprint, 2026. <a href="https://arxiv.org/abs/2609.04540" target="_blank">paper</a> / <a href="https://huggingface.co/autogluon/mitra-finetune" target="_blank">code and models</a>

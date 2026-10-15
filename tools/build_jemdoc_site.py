@@ -8,6 +8,7 @@ plain static files.
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
@@ -55,7 +56,7 @@ PAGE_DESCRIPTIONS = {
     ),
     "projects/index.html": (
         "Jiading Gai's research projects: F2Asm NVIDIA SASS encoders, DualKV FlashAttention, "
-        "CUDA kernel optimization, and IMPATIENT MRI."
+        "AMMO and CUDA kernel optimization, and IMPATIENT MRI."
     ),
     "patents/index.html": "Patents and patent applications coauthored by Jiading Gai.",
     "blog/index.html": (
@@ -74,6 +75,49 @@ PAGE_DESCRIPTIONS = {
 }
 
 
+HOMEPAGE_JSON_LD = {
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "WebSite",
+            "@id": f"{SITE_URL}/#website",
+            "url": f"{SITE_URL}/",
+            "name": "Jiading Gai",
+            "publisher": {"@id": f"{SITE_URL}/#person"},
+        },
+        {
+            "@type": "ProfilePage",
+            "@id": f"{SITE_URL}/#profile",
+            "url": f"{SITE_URL}/",
+            "name": "Jiading Gai",
+            "mainEntity": {"@id": f"{SITE_URL}/#person"},
+            "isPartOf": {"@id": f"{SITE_URL}/#website"},
+        },
+        {
+            "@type": "Person",
+            "@id": f"{SITE_URL}/#person",
+            "name": "Jiading Gai",
+            "url": f"{SITE_URL}/",
+            "jobTitle": "Senior Applied Scientist",
+            "worksFor": {"@type": "Organization", "name": "Amazon Web Services"},
+            "sameAs": [
+                "https://github.com/JiadingGai",
+                "https://scholar.google.com/citations?hl=en&user=B0OBVgsAAAAJ",
+                "https://dblp.org/pid/06/2795.html",
+                "https://www.amazon.science/author/jiading-gai",
+            ],
+            "knowsAbout": [
+                "CUDA",
+                "GPU systems",
+                "compiler engineering",
+                "machine learning systems",
+                "reinforcement learning",
+            ],
+        },
+    ],
+}
+
+
 def canonical_url(output: str) -> str:
     return f"{SITE_URL}/{output.removesuffix('index.html')}"
 
@@ -88,6 +132,10 @@ def postprocess_html(path: Path, output: str) -> None:
         metadata += '\n<meta name="robots" content="noindex" />'
     else:
         metadata += f'\n<link rel="canonical" href="{escape(canonical_url(output))}" />'
+    if output == "index.html":
+        metadata += '\n<script type="application/ld+json">\n'
+        metadata += json.dumps(HOMEPAGE_JSON_LD, indent=2)
+        metadata += '\n</script>'
     html = html.replace(marker, metadata)
     if output != "index.html":
         html = re.sub(r"(<title>.*?)(</title>)", r"\1 | Jiading Gai\2", html, count=1)

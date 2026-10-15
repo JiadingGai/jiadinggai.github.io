@@ -37,6 +37,7 @@ successfully.
 ## Google Search
 
 The build generates page-specific descriptions and canonical HTTPS URLs, plus
+`WebSite`, `ProfilePage`, and `Person` structured data on the homepage and
 `sitemap.xml` for the seven content pages. `robots.txt` allows crawling and points
 to the sitemap. The 404 page is excluded from the sitemap and marked `noindex`.
 Commit the rebuilt HTML and sitemap with source changes before publishing.

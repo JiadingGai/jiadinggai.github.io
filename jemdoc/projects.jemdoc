@@ -7,11 +7,11 @@ Selected research and engineering projects.
 
 Exact NVIDIA SASS instruction encoding learned with binary linear algebra.
 
-F2Asm learns 128-bit SASS encoders as vector-valued affine maps over $\mathbb{F}_2$. Streaming Gaussian elimination builds compact bases, detects inconsistent evidence, and rejects instructions outside the learned span.
+F2Asm learns 128-bit SASS encoders as vector-valued affine maps over $\mathbb{F}_2$. Streaming Gaussian elimination builds compact bases, detects inconsistent evidence, and rejects instructions outside the learned span. Its encoders are trained from 3,225 CUBINs.
 
-The system performs byte-exact CUBIN reconstruction across Hopper, Blackwell, and Rubin. Its public repository hosts the implementation and supporting artifacts.
+The system performs byte-exact CUBIN reconstruction across Hopper, Blackwell, and Rubin. It is the first open-source NVIDIA SASS assembler to support Rubin SM107.
 
-[https://arxiv.org/pdf/2608.20532 paper] / [https://github.com/JiadingGai/f2asm code]
+[https://arxiv.org/abs/2608.20532 paper] / [https://github.com/JiadingGai/f2asm code]
 
 == DualKV
 
@@ -23,7 +23,7 @@ DualKV removes redundant shared-prompt attention work in large-rollout RL traini
 
 The project targets long-context, many-rollout training regimes where the prompt is shared but completions diverge. The result is better policy-update throughput and lower wasted computation while keeping exact attention semantics.
 
-[https://arxiv.org/abs/2605.15422 paper] / [https://github.com/amazon-science/dualkv-flash-attn-for-rl code]
+[https://arxiv.org/abs/2605.15422 paper], [https://neurips.cc/virtual/2026/poster/148696 NeurIPS], and [https://github.com/amazon-science/dualkv-flash-attn-for-rl code]
 
 == Multi-Agent CUDA Kernel Optimizer
 
@@ -32,6 +32,14 @@ Bottleneck-analyzer agents for CUDA diagnosis and optimization.
 This project builds a multi-agent framework for autonomous CUDA kernel optimization. The key idea is to use bottleneck analyzers as expert surrogates that reason from occupancy, memory behavior, SASS, NCU metrics, roofline analysis, and Hopper WGMMA/TMA utilization.
 
 The framework was applied to kernel-benchmark tasks and production Hopper grouped-GEMM optimization work.
+
+== AMMO
+
+Autonomous, deployment-specific GPU kernel optimization for vLLM.
+
+AMMO profiles a target model, hardware, data type, and parallelism configuration; proposes and debates kernel changes; validates correctness and performance; and retains only improvements that survive end-to-end measurement. Unattended campaigns run in isolated sessions and produce auditable optimization reports.
+
+[https://github.com/amazon-science/ammo code]
 
 == IMPATIENT MRI
 
