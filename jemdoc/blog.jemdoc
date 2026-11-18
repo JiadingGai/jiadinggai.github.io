@@ -5,7 +5,7 @@ Technical notes on machine learning and systems.
 
 == Deep Reinforcement Learning
 
-Lecture notes based on Prof. Hung-yi Lee’s course.
+My personal study notes on Prof. Hung-yi Lee’s Deep Reinforcement Learning course.
 
 - Nov. 18, 2026: [2026/drl-lecture-1-policy-gradient/index.html DRL Lecture 1: Policy Gradient]. Policy gradients, Monte Carlo estimation, baselines, and advantages.
 - Nov. 18, 2026: [2026/drl-lecture-2-ppo/index.html DRL Lecture 2: Proximal Policy Optimization]. Importance sampling, trust regions, and the PPO surrogate objectives.

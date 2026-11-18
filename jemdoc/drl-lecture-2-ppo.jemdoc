@@ -7,10 +7,10 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 {}{raw}
 <article class="lecture-notes">
 <p class="lecture-meta"><time datetime="2026-11-18">November 18, 2026</time> · Lecture 2 of 3</p>
-<p>Lecture notes based on Prof. Hung-yi Lee’s <em>Deep Reinforcement Learning</em> course.</p>
-<p><a href="/assets/files/rl-notes/drl_lecture_2_proximal_policy_optimization_equations.tex" download>Download the original LaTeX notes</a></p>
-<nav class="lecture-series" aria-label="Deep reinforcement learning lecture series">
-<p><strong>Deep Reinforcement Learning · Lecture notes</strong></p>
+<p>My personal study notes on Prof. Hung-yi Lee’s <em>Deep Reinforcement Learning</em> course.</p>
+<p><a href="/assets/files/rl-notes/drl_lecture_2_proximal_policy_optimization_equations.tex" download>Download my LaTeX notes</a></p>
+<nav class="lecture-series" aria-label="Deep reinforcement learning study notes">
+<p><strong>Deep Reinforcement Learning · Personal study notes</strong></p>
 <ol>
 <li><a href="/blog/2026/drl-lecture-1-policy-gradient/">Policy Gradient</a></li>
 <li><a href="/blog/2026/drl-lecture-2-ppo/" aria-current="page">Proximal Policy Optimization</a></li>

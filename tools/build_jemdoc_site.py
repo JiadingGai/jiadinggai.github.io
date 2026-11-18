@@ -66,7 +66,7 @@ PAGE_DESCRIPTIONS = {
     ),
     "patents/index.html": "Patents and patent applications coauthored by Jiading Gai.",
     "blog/index.html": (
-        "Technical articles and lecture notes on reinforcement learning, GPU systems, "
+        "Technical articles and personal study notes by Jiading Gai on reinforcement learning, GPU systems, "
         "native function tracing, and Transformer machine translation."
     ),
     "blog/2026/bpftrace-uprobe-stack/index.html": (
@@ -77,9 +77,9 @@ PAGE_DESCRIPTIONS = {
         "Transformer machine translation in PyTorch: attention, encoder-decoder interaction, "
         "training, and BLEU, with equations and code."
     ),
-    "blog/2026/drl-lecture-1-policy-gradient/index.html": "DRL Lecture 1: Policy Gradient: Policy gradients, Monte Carlo estimation, baselines, and advantages.",
-    "blog/2026/drl-lecture-2-ppo/index.html": "DRL Lecture 2: Proximal Policy Optimization: Importance sampling, trust regions, and the PPO surrogate objectives.",
-    "blog/2026/drl-lecture-3-q-learning/index.html": "DRL Lecture 3: Q-learning: Value functions, temporal-difference learning, target networks, and replay.",
+    "blog/2026/drl-lecture-1-policy-gradient/index.html": "Jiading Gai's personal study notes on policy gradients, Monte Carlo estimation, baselines, and advantages.",
+    "blog/2026/drl-lecture-2-ppo/index.html": "Jiading Gai's personal study notes on importance sampling, trust regions, and the PPO surrogate objectives.",
+    "blog/2026/drl-lecture-3-q-learning/index.html": "Jiading Gai's personal study notes on value functions, temporal-difference learning, target networks, and replay.",
     "404.html": "The requested page could not be found on Jiading Gai's website.",
 }
 
