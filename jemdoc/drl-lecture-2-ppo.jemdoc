@@ -1,0 +1,209 @@
+# jemdoc: menu{jemdoc/MENU}{blog/2026/drl-lecture-2-ppo/index.html}{../../../}
+# jemdoc: nofooter
+= DRL Lecture 2: Proximal Policy Optimization
+Importance sampling, trust regions, and the PPO surrogate objectives.
+
+~
+{}{raw}
+<article class="lecture-notes">
+<p class="lecture-meta"><time datetime="2026-11-18">November 18, 2026</time> · Lecture 2 of 3</p>
+<p>Lecture notes based on Prof. Hung-yi Lee’s <em>Deep Reinforcement Learning</em> course.</p>
+<p><a href="/assets/files/rl-notes/drl_lecture_2_proximal_policy_optimization_equations.tex" download>Download the original LaTeX notes</a></p>
+<nav class="lecture-series" aria-label="Deep reinforcement learning lecture series">
+<p><strong>Deep Reinforcement Learning · Lecture notes</strong></p>
+<ol>
+<li><a href="/blog/2026/drl-lecture-1-policy-gradient/">Policy Gradient</a></li>
+<li><a href="/blog/2026/drl-lecture-2-ppo/" aria-current="page">Proximal Policy Optimization</a></li>
+<li><a href="/blog/2026/drl-lecture-3-q-learning/">Q-learning</a></li>
+</ol>
+</nav>
+<nav class="lecture-toc" aria-label="On this page"><p><strong>On this page</strong></p><ol>
+<li><a href="#on-policy-policy-gradient-recap-and-bottleneck">On-Policy Policy Gradient Recap and Bottleneck</a></li>
+<li><a href="#importance-sampling-and-variance-analysis">Importance Sampling and Variance Analysis</a></li>
+<li><a href="#from-on-policy-to-off-policy-surrogate-objective">From On-Policy to Off-Policy Surrogate Objective</a></li>
+<li><a href="#trpo-and-proximal-policy-optimization-ppo">TRPO and Proximal Policy Optimization (PPO)</a></li>
+<li><a href="#summary-of-notation">Summary of Notation</a></li>
+</ol></nav>
+<h2 id="on-policy-policy-gradient-recap-and-bottleneck">On-Policy Policy Gradient Recap and Bottleneck</h2>
+
+<p>In standard on-policy Policy Gradient, the actor policy $\pi_\theta$ interacts directly with the environment to collect trajectories, and the expected reward gradient is estimated using the advantage function $A^\theta(s_t, a_t)$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    \nabla \bar{R}_\theta = E_{\tau \sim p_\theta(\tau)}\big[R(\tau) \nabla \log p_\theta(\tau)\big] \approx \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} A^\theta(s_t^n, a_t^n) \nabla \log p_\theta(a_t^n \mid s_t^n).
+\end{equation}
+</div>
+
+<p>After a single gradient ascent update with learning rate $\eta$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    \theta \leftarrow \theta + \eta \nabla \bar{R}_\theta,
+\end{equation}
+</div>
+
+<p>the policy distribution changes from $p_\theta$ to $p_{\theta_{\text{new}}}$, rendering previously sampled trajectories invalid for further updates. Converting on-policy training into off-policy training allows reusing trajectories collected by a fixed behavior policy $\pi_{\theta'}$.</p>
+
+<h2 id="importance-sampling-and-variance-analysis">Importance Sampling and Variance Analysis</h2>
+
+<p>Suppose we wish to estimate the expectation of $f(x)$ under a target distribution $p(x)$ from which direct sampling is difficult or unavailable:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    E_{x \sim p}[f(x)] \approx \frac{1}{N} \sum_{i=1}^{N} f(x^i), \qquad x^i \sim p(x).
+\end{equation}
+</div>
+
+<p>Using a proposal distribution $q(x)$ (with $q(x) &gt; 0$ wherever $p(x) &gt; 0$), the expectation can be rewritten as an expectation under $q(x)$ weighted by the importance ratio $\frac{p(x)}{q(x)}$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{align}
+    E_{x \sim p}[f(x)] &amp;= \int f(x) p(x)\, dx \nonumber \\
+    &amp;= \int f(x) \frac{p(x)}{q(x)} q(x)\, dx \nonumber \\
+    &amp;= E_{x \sim q}\left[f(x) \frac{p(x)}{q(x)}\right].
+\end{align}
+</div>
+
+<p>Although both estimators share the same theoretical expectation, their variances differ. Using the variance identity $\operatorname{Var}[X] = E[X^2] - \big(E[X]\big)^2$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{align}
+    \operatorname{Var}_{x \sim p}[f(x)] &amp;= E_{x \sim p}\big[f(x)^2\big] - \big(E_{x \sim p}[f(x)]\big)^2, \\
+    \operatorname{Var}_{x \sim q}\left[f(x) \frac{p(x)}{q(x)}\right] &amp;= E_{x \sim q}\left[\left(f(x) \frac{p(x)}{q(x)}\right)^2\right] - \left(E_{x \sim q}\left[f(x) \frac{p(x)}{q(x)}\right]\right)^2 \nonumber \\
+    &amp;= E_{x \sim p}\left[f(x)^2 \frac{p(x)}{q(x)}\right] - \big(E_{x \sim p}[f(x)]\big)^2.
+\end{align}
+</div>
+
+<p>When $p(x)$ and $q(x)$ diverge substantially, the ratio $\frac{p(x)}{q(x)}$ becomes large, inflating the variance of the importance-sampled estimator and causing severe approximation error under finite samples.</p>
+
+<h2 id="from-on-policy-to-off-policy-surrogate-objective">From On-Policy to Off-Policy Surrogate Objective</h2>
+
+<p>Applying importance sampling to transition from the target policy $\pi_\theta$ (being optimized) to the behavior policy $\pi_{\theta'}$ (used to collect demonstrations) yields:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{align}
+    \nabla \bar{R}_\theta &amp;= E_{(s_t, a_t) \sim \pi_\theta}\big[A^\theta(s_t, a_t) \nabla \log p_\theta(a_t^n \mid s_t^n)\big] \nonumber \\
+    &amp;= E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(s_t, a_t)}{p_{\theta'}(s_t, a_t)} A^\theta(s_t, a_t) \nabla \log p_\theta(a_t^n \mid s_t^n)\right].
+\end{align}
+</div>
+
+<p>Factorizing the joint state-action probability $p_\theta(s_t, a_t) = p_\theta(a_t \mid s_t) p_\theta(s_t)$ and substituting $A^{\theta'}(s_t, a_t)$ (evaluated from trajectories gathered under $\theta'$):</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    \nabla \bar{R}_\theta = E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} \frac{p_\theta(s_t)}{p_{\theta'}(s_t)} A^{\theta'}(s_t, a_t) \nabla \log p_\theta(a_t^n \mid s_t^n)\right].
+\end{equation}
+</div>
+
+<p>Assuming state visitation probabilities are approximately unchanged between nearby policies ($p_\theta(s_t) \approx p_{\theta'}(s_t)$, so $\frac{p_\theta(s_t)}{p_{\theta'}(s_t)} \approx 1$) and using $\nabla p_\theta(a_t \mid s_t) = p_\theta(a_t \mid s_t) \nabla \log p_\theta(a_t \mid s_t)$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{align}
+    \nabla \bar{R}_\theta &amp;\approx E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t) \nabla \log p_\theta(a_t \mid s_t)\right] \nonumber \\
+    &amp;= E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{\nabla p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t)\right].
+\end{align}
+</div>
+
+<p>Integrating with respect to $\theta$ gives the off-policy surrogate objective function $J^{\theta'}(\theta)$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    J^{\theta'}(\theta) = E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t)\right].
+\end{equation}
+</div>
+
+<h2 id="trpo-and-proximal-policy-optimization-ppo">TRPO and Proximal Policy Optimization (PPO)</h2>
+
+<p>Because importance sampling requires $\pi_\theta$ and $\pi_{\theta'}$ to remain close, constraints are placed on the Kullback–Leibler (KL) divergence $\operatorname{KL}(\theta, \theta')$, which measures the behavioral divergence between the action distributions $p_\theta(\cdot \mid s_t)$ and $p_{\theta'}(\cdot \mid s_t)$ (rather than Euclidean distance in parameter space).</p>
+
+<h3 id="trust-region-policy-optimization-trpo">Trust Region Policy Optimization (TRPO)</h3>
+
+<p>TRPO maximizes $J^{\theta'}(\theta)$ subject to an explicit hard trust-region constraint on the KL divergence:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    J_{\text{TRPO}}^{\theta'}(\theta) = E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t)\right], \qquad \text{s.t. } \operatorname{KL}(\theta, \theta') &lt; \delta.
+\end{equation}
+</div>
+
+<h3 id="ppo1-adaptive-kl-penalty">PPO1: Adaptive KL Penalty</h3>
+
+<p>PPO1 incorporates the KL divergence directly into the objective as a soft penalty weighted by an adaptive coefficient $\beta$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    J_{\text{PPO}}^{\theta'}(\theta) = J^{\theta'}(\theta) - \beta \operatorname{KL}(\theta, \theta').
+\end{equation}
+</div>
+
+<p>During training, $\beta$ is dynamically adjusted after each update by comparing the realized divergence $\operatorname{KL}(\theta, \theta')$ against target bounds $\operatorname{KL}_{\max}$ and $\operatorname{KL}_{\min}$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{align}
+    \text{If } \operatorname{KL}(\theta, \theta') &gt; \operatorname{KL}_{\max}, \quad &amp;\text{increase } \beta \quad (\text{e.g., } \beta \leftarrow 2\beta), \\
+    \text{If } \operatorname{KL}(\theta, \theta') &lt; \operatorname{KL}_{\min}, \quad &amp;\text{decrease } \beta \quad (\text{e.g., } \beta \leftarrow \beta / 2).
+\end{align}
+</div>
+
+<h3 id="ppo2-clipped-surrogate-objective">PPO2: Clipped Surrogate Objective</h3>
+
+<p>To avoid computing KL divergences explicitly, PPO2 enforces proximity by clipping the probability ratio $\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)}$ within $[1 - \epsilon, 1 + \epsilon]$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    J_{\text{PPO2}}^{\theta'}(\theta) \approx \sum_{(s_t, a_t)} \min\left( \frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t),\; \operatorname{clip}\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 - \epsilon,\; 1 + \epsilon\right) A^{\theta'}(s_t, a_t) \right),
+\end{equation}
+</div>
+
+<p>where the clipping function is defined as:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    \operatorname{clip}(r, 1 - \epsilon, 1 + \epsilon) = \begin{cases}
+        1 - \epsilon, &amp; r &lt; 1 - \epsilon, \\
+        r, &amp; 1 - \epsilon \le r \le 1 + \epsilon, \\
+        1 + \epsilon, &amp; r &gt; 1 + \epsilon.
+    \end{cases}
+\end{equation}
+</div>
+
+<p>Taking the minimum between the unclipped and clipped terms yields two distinct regimes depending on the sign of $A^{\theta'}(s_t, a_t)$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{align}
+    \text{Case 1 } \big(A^{\theta'}(s_t, a_t) &gt; 0\big): \quad &amp; \min\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 + \epsilon\right) A^{\theta'}(s_t, a_t), \\
+    \text{Case 2 } \big(A^{\theta'}(s_t, a_t) &lt; 0\big): \quad &amp; \max\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 - \epsilon\right) A^{\theta'}(s_t, a_t).
+\end{align}
+</div>
+
+<p>When $A^{\theta'} &gt; 0$, increasing $p_\theta(a_t \mid s_t)$ yields no additional objective gain once the ratio exceeds $1 + \epsilon$. When $A^{\theta'} &lt; 0$, decreasing $p_\theta(a_t \mid s_t)$ yields no additional objective gain once the ratio drops below $1 - \epsilon$.</p>
+
+<h2 id="summary-of-notation">Summary of Notation</h2>
+
+<div class="table-scroll" role="region" aria-label="Notation summary" tabindex="0">
+<table class="notation-table">
+<thead><tr>
+<th scope="col"><strong>Symbol</strong></th>
+<th scope="col"><strong>Definition</strong></th>
+</tr></thead>
+<tbody>
+<tr><td>$\theta$</td><td>Parameters of the target actor policy being optimized</td></tr>
+<tr><td>$\theta'$</td><td>Fixed parameters of the behavior policy used to sample training data</td></tr>
+<tr><td>$p(x), q(x)$</td><td>Target distribution and proposal distribution in importance sampling</td></tr>
+<tr><td>$\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)}$</td><td>Importance sampling probability ratio between target and behavior policies</td></tr>
+<tr><td>$A^{\theta'}(s_t, a_t)$</td><td>Advantage function evaluated on trajectories collected under $\pi_{\theta'}$</td></tr>
+<tr><td>$J^{\theta'}(\theta)$</td><td>Off-policy importance-sampled surrogate objective function</td></tr>
+<tr><td>$\operatorname{KL}(\theta, \theta')$</td><td>Kullback–Leibler divergence between action distributions of $\pi_\theta$ and $\pi_{\theta'}$</td></tr>
+<tr><td>$\delta$</td><td>Hard KL divergence trust-region threshold in TRPO</td></tr>
+<tr><td>$\beta$</td><td>Adaptive KL penalty weight in PPO1</td></tr>
+<tr><td>$\operatorname{KL}_{\max}, \operatorname{KL}_{\min}$</td><td>Upper and lower KL thresholds governing adaptive updates to $\beta$</td></tr>
+<tr><td>$\epsilon$</td><td>Clipping hyperparameter defining the ratio interval $[1 - \epsilon, 1 + \epsilon]$ in PPO2</td></tr>
+</tbody></table>
+</div>
+<nav class="lecture-pagination" aria-label="Lecture navigation">
+<a href="/blog/">← All blog posts</a>
+<a href="/blog/2026/drl-lecture-1-policy-gradient/">← Lecture 1</a>
+<a href="/blog/2026/drl-lecture-3-q-learning/">Lecture 3 →</a>
+</nav>
+</article>
+~

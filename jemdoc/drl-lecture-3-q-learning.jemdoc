@@ -1,0 +1,233 @@
+# jemdoc: menu{jemdoc/MENU}{blog/2026/drl-lecture-3-q-learning/index.html}{../../../}
+# jemdoc: nofooter
+= DRL Lecture 3: Q-learning
+Value functions, temporal-difference learning, target networks, and replay.
+
+~
+{}{raw}
+<article class="lecture-notes">
+<p class="lecture-meta"><time datetime="2026-11-18">November 18, 2026</time> · Lecture 3 of 3</p>
+<p>Lecture notes based on Prof. Hung-yi Lee’s <em>Deep Reinforcement Learning</em> course.</p>
+<p><a href="/assets/files/rl-notes/drl_lecture_3_q_learning_basic_idea_equations.tex" download>Download the original LaTeX notes</a></p>
+<nav class="lecture-series" aria-label="Deep reinforcement learning lecture series">
+<p><strong>Deep Reinforcement Learning · Lecture notes</strong></p>
+<ol>
+<li><a href="/blog/2026/drl-lecture-1-policy-gradient/">Policy Gradient</a></li>
+<li><a href="/blog/2026/drl-lecture-2-ppo/">Proximal Policy Optimization</a></li>
+<li><a href="/blog/2026/drl-lecture-3-q-learning/" aria-current="page">Q-learning</a></li>
+</ol>
+</nav>
+<nav class="lecture-toc" aria-label="On this page"><p><strong>On this page</strong></p><ol>
+<li><a href="#critic-and-state-value-function">Critic and State Value Function</a></li>
+<li><a href="#state-action-value-function-and-policy-improvement">State-Action Value Function and Policy Improvement</a></li>
+<li><a href="#target-network-and-exploration-strategies">Target Network and Exploration Strategies</a></li>
+<li><a href="#experience-replay-and-off-policy-q-learning-update">Experience Replay and Off-Policy Q-Learning Update</a></li>
+<li><a href="#summary-of-notation">Summary of Notation</a></li>
+</ol></nav>
+<h2 id="critic-and-state-value-function">Critic and State Value Function</h2>
+
+<p>Unlike an actor that directly outputs actions, a critic evaluates how good a given actor policy $\pi$ is. The <strong>state value function</strong> $V^\pi(s)$ is defined as the expected cumulated reward obtained after visiting state $s$ and following actor $\pi$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    V^\pi(s) = E_\pi\left[\sum_{t'=t}^{T} r_{t'} \;\middle|\; s_t = s\right].
+\end{equation}
+</div>
+
+<h3 id="monte-carlo-mc-vs-temporal-difference-td-estimation">Monte-Carlo (MC) vs. Temporal-Difference (TD) Estimation</h3>
+
+<ul>
+
+<li>
+
+<p><strong>Monte-Carlo (MC) Approach:</strong> The critic observes $\pi$ playing until the end of an episode. After visiting state $s_a$, let the total cumulated reward until episode termination be $G_a$ (and $G_b$ after visiting $s_b$). The critic is trained via regression toward these observed episode returns:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+        V^\pi(s_a) \approx G_a, \qquad V^\pi(s_b) \approx G_b.
+    \end{equation}
+</div>
+
+</li>
+
+<li>
+
+<p><strong>Temporal-Difference (TD) Approach:</strong> Using a single transition $(s_t, a_t, r_t, s_{t+1})$, the state value function satisfies the Bellman consistency relation:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+        V^\pi(s_t) = V^\pi(s_{t+1}) + r_t \iff V^\pi(s_t) - V^\pi(s_{t+1}) = r_t.
+    \end{equation}
+</div>
+
+<p>Training updates $V^\pi$ so that the difference $V^\pi(s_t) - V^\pi(s_{t+1})$ matches the immediate reward $r_t$ without waiting for the episode to terminate.</p>
+
+</li>
+
+</ul>
+
+<h3 id="variance-comparison-and-sutton-example-6-4">Variance Comparison and Sutton Example 6.4</h3>
+
+<p>In Monte-Carlo estimation, $G_a$ is a summation of stochastic rewards over many steps, producing larger variance because variance scales quadratically with scale and step accumulation:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    \operatorname{Var}(kX) = k^2 \operatorname{Var}(X).
+\end{equation}
+</div>
+
+<p>In contrast, TD estimation bootstraps from $r_t + V^\pi(s_{t+1})$, yielding smaller variance at the cost of potential bias if $V^\pi(s_{t+1})$ is inaccurate.</p>
+<p>For the 8-episode benchmark (Sutton Example 6.4) consisting of one trajectory $(s_a, r=0, s_b, r=0, \text{END})$, six trajectories $(s_b, r=1, \text{END})$, and one trajectory $(s_b, r=0, \text{END})$, both estimators agree on $V^\pi(s_b) = \frac{3}{4}$, whereas their estimates at $s_a$ differ:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    \text{Monte-Carlo:} \quad V^\pi(s_a) = 0, \qquad
+    \text{Temporal-Difference:} \quad V^\pi(s_a) = V^\pi(s_b) + r = \frac{3}{4} + 0 = \frac{3}{4}.
+\end{equation}
+</div>
+
+<h2 id="state-action-value-function-and-policy-improvement">State-Action Value Function and Policy Improvement</h2>
+
+<p>The <strong>state-action value function</strong> $Q^\pi(s, a)$ measures the expected cumulated reward obtained after taking action $a$ in state $s$ and subsequently following actor $\pi$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    Q^\pi(s, a) = E_\pi\left[\sum_{t'=t}^{T} r_{t'} \;\middle|\; s_t = s, a_t = a\right].
+\end{equation}
+</div>
+
+<p>Given $Q^\pi(s, a)$ for a discrete action space, Q-learning defines a new deterministic actor $\pi'$ with no additional network parameters by selecting the action that maximizes $Q^\pi(s, a)$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    \pi'(s) = \arg\max_a Q^\pi(s, a).
+\end{equation}
+</div>
+
+<h3 id="policy-improvement-guarantee">Policy Improvement Guarantee</h3>
+
+<p>The greedy policy $\pi'$ is guaranteed to outperform or match $\pi$ across every state, i.e., $V^{\pi'}(s) \ge V^\pi(s)$ for all $s$. By definition of $\pi'$, at any state $s$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    V^\pi(s) = Q^\pi\big(s, \pi(s)\big) \le \max_a Q^\pi(s, a) = Q^\pi\big(s, \pi'(s)\big).
+\end{equation}
+</div>
+
+<p>Expanding $Q^\pi\big(s, \pi'(s)\big)$ recursively over consecutive time steps establishes the inequality:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{align}
+    V^\pi(s) &amp;\le Q^\pi\big(s, \pi'(s)\big) \nonumber \\
+    &amp;= E\Big[r_{t+1} + V^\pi(s_{t+1}) \;\Big|\; s_t = s, a_t = \pi'(s_t)\Big] \nonumber \\
+    &amp;\le E\Big[r_{t+1} + Q^\pi\big(s_{t+1}, \pi'(s_{t+1})\big) \;\Big|\; s_t = s, a_t = \pi'(s_t)\Big] \nonumber \\
+    &amp;= E\Big[r_{t+1} + r_{t+2} + V^\pi(s_{t+2}) \;\Big|\; s_t = s, a_t = \pi'(s_t), a_{t+1} = \pi'(s_{t+1})\Big] \nonumber \\
+    &amp;\le E\Big[r_{t+1} + r_{t+2} + Q^\pi\big(s_{t+2}, \pi'(s_{t+2})\big) \;\Big|\; s_t = s, a_t = \pi'(s_t), a_{t+1} = \pi'(s_{t+1})\Big] \nonumber \\
+    &amp;\;\;\vdots \nonumber \\
+    &amp;\le V^{\pi'}(s).
+\end{align}
+</div>
+
+<h2 id="target-network-and-exploration-strategies">Target Network and Exploration Strategies</h2>
+
+<h3 id="td-regression-with-a-target-network">TD Regression with a Target Network</h3>
+
+<p>For a transition $(s_t, a_t, r_t, s_{t+1})$, the TD relation for the state-action value function is:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    Q^\pi(s_t, a_t) = r_t + Q^\pi\big(s_{t+1}, \pi(s_{t+1})\big).
+\end{equation}
+</div>
+
+<p>Because updating $Q$ simultaneously shifts both $Q(s_t, a_t)$ and the target $r_t + \max_a Q(s_{t+1}, a)$, Q-learning maintains a separate <strong>target network</strong> $\hat{Q}$ whose parameters are held fixed for $C$ updates while $Q$ is trained via regression, and periodically copied via $\hat{Q} \leftarrow Q$.</p>
+
+<h3 id="exploration-mechanisms">Exploration Mechanisms</h3>
+
+<p>Pure greedy action selection $a = \arg\max_a Q(s, a)$ fails to explore actions whose initial value estimates are low. Two stochastic exploration policies are introduced:</p>
+
+<ul>
+
+<li>
+
+<p><strong>Epsilon-Greedy ($\varepsilon$-Greedy) Exploration</strong> (where $\varepsilon$ typically decays during training):</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+        a = \begin{cases}
+            \arg\max_a Q(s, a), &amp; \text{with probability } 1 - \varepsilon, \\
+            \text{random action}, &amp; \text{otherwise (with probability } \varepsilon\text{)}.
+        \end{cases}
+    \end{equation}
+</div>
+
+</li>
+
+<li>
+
+<p><strong>Boltzmann Exploration:</strong> Actions are sampled according to a softmax distribution over Q-values:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+        P(a \mid s) = \frac{\exp\big(Q(s, a)\big)}{\sum_{a'} \exp\big(Q(s, a')\big)}.
+    \end{equation}
+</div>
+
+</li>
+
+</ul>
+
+<h2 id="experience-replay-and-off-policy-q-learning-update">Experience Replay and Off-Policy Q-Learning Update</h2>
+
+<p>To improve sample efficiency and decorrelate sequential transitions, Q-learning stores experience tuples $(s_t, a_t, r_t, s_{t+1})$ collected across past policies into an <strong>experience replay buffer</strong> (dropping the oldest entries when full). Because the Bellman target depends only on the optimal next-state value rather than the behavior policy that generated the tuple, Q-learning operates <strong>off-policy</strong>.</p>
+<p>At each training iteration, a mini-batch of transitions $(s_i, a_i, r_i, s_{i+1})$ is sampled from the buffer, and the target value $y_i$ is computed using the frozen target network $\hat{Q}$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    y_i = r_i + \max_a \hat{Q}(s_{i+1}, a).
+\end{equation}
+</div>
+
+<p>The parameters $\theta$ of the online network $Q_\theta$ are updated via regression to minimize the squared TD error toward $y_i$:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    \mathcal{L}(\theta) = \big(y_i - Q_\theta(s_i, a_i)\big)^2 = \left(r_i + \max_a \hat{Q}(s_{i+1}, a) - Q_\theta(s_i, a_i)\right)^2,
+\end{equation}
+</div>
+
+<p>and every $C$ updates the target network parameters are synchronized:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}
+    \hat{Q} \leftarrow Q.
+\end{equation}
+</div>
+
+<h2 id="summary-of-notation">Summary of Notation</h2>
+
+<div class="table-scroll" role="region" aria-label="Notation summary" tabindex="0">
+<table class="notation-table">
+<thead><tr>
+<th scope="col"><strong>Symbol</strong></th>
+<th scope="col"><strong>Definition</strong></th>
+</tr></thead>
+<tbody>
+<tr><td>$\pi, \pi'$</td><td>Current actor policy and greedy improved actor policy $\pi'(s) = \arg\max_a Q^\pi(s, a)$</td></tr>
+<tr><td>$V^\pi(s)$</td><td>State value function: expected cumulated return from state $s$ under policy $\pi$</td></tr>
+<tr><td>$Q^\pi(s, a)$</td><td>State-action value function: expected cumulated return after taking action $a$ in state $s$</td></tr>
+<tr><td>$G_a, G_b$</td><td>Empirical cumulated episode returns observed after visiting states $s_a, s_b$</td></tr>
+<tr><td>$s_t, a_t, r_t, s_{t+1}$</td><td>Experience transition tuple stored in the replay buffer</td></tr>
+<tr><td>$Q, \hat{Q}$</td><td>Online Q-network being trained and frozen target Q-network</td></tr>
+<tr><td>$\varepsilon$</td><td>Exploration probability hyperparameter in $\varepsilon$-greedy action selection</td></tr>
+<tr><td>$P(a \mid s)$</td><td>Action sampling probability under Boltzmann exploration</td></tr>
+<tr><td>$y_i$</td><td>Regression target $r_i + \max_a \hat{Q}(s_{i+1}, a)$ computed with the target network</td></tr>
+<tr><td>$C$</td><td>Update interval (number of steps) between target network resets $\hat{Q} \leftarrow Q$</td></tr>
+</tbody></table>
+</div>
+<nav class="lecture-pagination" aria-label="Lecture navigation">
+<a href="/blog/">← All blog posts</a>
+<a href="/blog/2026/drl-lecture-2-ppo/">← Lecture 2</a>
+</nav>
+</article>
+~

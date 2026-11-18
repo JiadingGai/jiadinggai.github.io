@@ -20,6 +20,11 @@ Use GitHub Pages with:
 - Stylesheet: `assets/css/jemdoc.css`
 - Generated pages: `index.html`, `publications/index.html`,
   `projects/index.html`, `patents/index.html`, `blog/index.html`
+- RL lecture posts: `jemdoc/drl-lecture-*.jemdoc`, published under
+  `blog/2026/drl-lecture-*/`. Edit these jemdoc files for web revisions.
+- Downloadable RL notes: `assets/files/rl-notes/*.tex`. Keep mathematical
+  corrections in sync with the paired jemdoc pages; the web pages retain
+  the course attribution.
 
 ## Rebuild
 
@@ -38,7 +43,7 @@ successfully.
 
 The build generates page-specific descriptions and canonical HTTPS URLs, plus
 `WebSite`, `ProfilePage`, and `Person` structured data on the homepage and
-`sitemap.xml` for the seven content pages. `robots.txt` allows crawling and points
+`sitemap.xml` for all ten content pages. `robots.txt` allows crawling and points
 to the sitemap. The 404 page is excluded from the sitemap and marked `noindex`.
 Commit the rebuilt HTML and sitemap with source changes before publishing.
 

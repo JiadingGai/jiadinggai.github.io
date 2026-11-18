@@ -1,0 +1,168 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[a4paper, margin=2.5cm]{geometry}
+\usepackage{fontspec}
+\usepackage[english, bidi=basic, provide=*]{babel}
+\babelprovide[import, onchar=ids fonts]{english}
+\babelfont{rm}{Noto Sans}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\definecolor{accent}{HTML}{1E3A8A}
+\definecolor{muted}{HTML}{475569}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=accent,
+    urlcolor=accent,
+    pdftitle={DRL Lecture 3: Q-learning (Basic Idea) - Complete Equations}
+}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE \textbf{\textcolor{accent}{DRL Lecture 3: Q-learning (Basic Idea)}}}\\[6pt]
+    {\large Complete Mathematical Formulations and Derivations}\\[4pt]
+    {\small \textcolor{muted}{Course: Deep Reinforcement Learning (Prof. Hung-yi Lee, National Taiwan University)}}
+\end{center}
+
+\vspace{6pt}
+\hrule
+\vspace{12pt}
+
+\section{Critic and State Value Function}
+
+Unlike an actor that directly outputs actions, a critic evaluates how good a given actor policy $\pi$ is. The \textbf{state value function} $V^\pi(s)$ is defined as the expected cumulated reward obtained after visiting state $s$ and following actor $\pi$:
+\begin{equation}
+    V^\pi(s) = E_\pi\left[\sum_{t'=t}^{T} r_{t'} \;\middle|\; s_t = s\right].
+\end{equation}
+
+\subsection*{Monte-Carlo (MC) vs. Temporal-Difference (TD) Estimation}
+
+\begin{itemize}
+    \item \textbf{Monte-Carlo (MC) Approach:} The critic observes $\pi$ playing until the end of an episode. After visiting state $s_a$, let the total cumulated reward until episode termination be $G_a$ (and $G_b$ after visiting $s_b$). The critic is trained via regression toward these observed episode returns:
+    \begin{equation}
+        V^\pi(s_a) \approx G_a, \qquad V^\pi(s_b) \approx G_b.
+    \end{equation}
+
+    \item \textbf{Temporal-Difference (TD) Approach:} Using a single transition $(s_t, a_t, r_t, s_{t+1})$, the state value function satisfies the Bellman consistency relation:
+    \begin{equation}
+        V^\pi(s_t) = V^\pi(s_{t+1}) + r_t \iff V^\pi(s_t) - V^\pi(s_{t+1}) = r_t.
+    \end{equation}
+    Training updates $V^\pi$ so that the difference $V^\pi(s_t) - V^\pi(s_{t+1})$ matches the immediate reward $r_t$ without waiting for the episode to terminate.
+\end{itemize}
+
+\subsection*{Variance Comparison and Sutton Example 6.4}
+
+In Monte-Carlo estimation, $G_a$ is a summation of stochastic rewards over many steps, producing larger variance because variance scales quadratically with scale and step accumulation:
+\begin{equation}
+    \operatorname{Var}(kX) = k^2 \operatorname{Var}(X).
+\end{equation}
+In contrast, TD estimation bootstraps from $r_t + V^\pi(s_{t+1})$, yielding smaller variance at the cost of potential bias if $V^\pi(s_{t+1})$ is inaccurate.
+
+For the 8-episode benchmark (Sutton Example 6.4) consisting of one trajectory $(s_a, r=0, s_b, r=0, \text{END})$, six trajectories $(s_b, r=1, \text{END})$, and one trajectory $(s_b, r=0, \text{END})$, both estimators agree on $V^\pi(s_b) = \frac{3}{4}$, whereas their estimates at $s_a$ differ:
+\begin{equation}
+    \text{Monte-Carlo:} \quad V^\pi(s_a) = 0, \qquad
+    \text{Temporal-Difference:} \quad V^\pi(s_a) = V^\pi(s_b) + r = \frac{3}{4} + 0 = \frac{3}{4}.
+\end{equation}
+
+\section{State-Action Value Function and Policy Improvement}
+
+The \textbf{state-action value function} $Q^\pi(s, a)$ measures the expected cumulated reward obtained after taking action $a$ in state $s$ and subsequently following actor $\pi$:
+\begin{equation}
+    Q^\pi(s, a) = E_\pi\left[\sum_{t'=t}^{T} r_{t'} \;\middle|\; s_t = s, a_t = a\right].
+\end{equation}
+
+Given $Q^\pi(s, a)$ for a discrete action space, Q-learning defines a new deterministic actor $\pi'$ with no additional network parameters by selecting the action that maximizes $Q^\pi(s, a)$:
+\begin{equation}
+    \pi'(s) = \arg\max_a Q^\pi(s, a).
+\end{equation}
+
+\subsection*{Policy Improvement Guarantee}
+
+The greedy policy $\pi'$ is guaranteed to outperform or match $\pi$ across every state, i.e., $V^{\pi'}(s) \ge V^\pi(s)$ for all $s$. By definition of $\pi'$, at any state $s$:
+\begin{equation}
+    V^\pi(s) = Q^\pi\big(s, \pi(s)\big) \le \max_a Q^\pi(s, a) = Q^\pi\big(s, \pi'(s)\big).
+\end{equation}
+
+Expanding $Q^\pi\big(s, \pi'(s)\big)$ recursively over consecutive time steps establishes the inequality:
+\begin{align}
+    V^\pi(s) &\le Q^\pi\big(s, \pi'(s)\big) \nonumber \\
+    &= E\Big[r_{t+1} + V^\pi(s_{t+1}) \;\Big|\; s_t = s, a_t = \pi'(s_t)\Big] \nonumber \\
+    &\le E\Big[r_{t+1} + Q^\pi\big(s_{t+1}, \pi'(s_{t+1})\big) \;\Big|\; s_t = s, a_t = \pi'(s_t)\Big] \nonumber \\
+    &= E\Big[r_{t+1} + r_{t+2} + V^\pi(s_{t+2}) \;\Big|\; s_t = s, a_t = \pi'(s_t), a_{t+1} = \pi'(s_{t+1})\Big] \nonumber \\
+    &\le E\Big[r_{t+1} + r_{t+2} + Q^\pi\big(s_{t+2}, \pi'(s_{t+2})\big) \;\Big|\; s_t = s, a_t = \pi'(s_t), a_{t+1} = \pi'(s_{t+1})\Big] \nonumber \\
+    &\;\;\vdots \nonumber \\
+    &\le V^{\pi'}(s).
+\end{align}
+
+\section{Target Network and Exploration Strategies}
+
+\subsection*{TD Regression with a Target Network}
+
+For a transition $(s_t, a_t, r_t, s_{t+1})$, the TD relation for the state-action value function is:
+\begin{equation}
+    Q^\pi(s_t, a_t) = r_t + Q^\pi\big(s_{t+1}, \pi(s_{t+1})\big).
+\end{equation}
+Because updating $Q$ simultaneously shifts both $Q(s_t, a_t)$ and the target $r_t + \max_a Q(s_{t+1}, a)$, Q-learning maintains a separate \textbf{target network} $\hat{Q}$ whose parameters are held fixed for $C$ updates while $Q$ is trained via regression, and periodically copied via $\hat{Q} \leftarrow Q$.
+
+\subsection*{Exploration Mechanisms}
+
+Pure greedy action selection $a = \arg\max_a Q(s, a)$ fails to explore actions whose initial value estimates are low. Two stochastic exploration policies are introduced:
+\begin{itemize}
+    \item \textbf{Epsilon-Greedy ($\varepsilon$-Greedy) Exploration} (where $\varepsilon$ typically decays during training):
+    \begin{equation}
+        a = \begin{cases}
+            \arg\max_a Q(s, a), & \text{with probability } 1 - \varepsilon, \\
+            \text{random action}, & \text{otherwise (with probability } \varepsilon\text{)}.
+        \end{cases}
+    \end{equation}
+
+    \item \textbf{Boltzmann Exploration:} Actions are sampled according to a softmax distribution over Q-values:
+    \begin{equation}
+        P(a \mid s) = \frac{\exp\big(Q(s, a)\big)}{\sum_{a'} \exp\big(Q(s, a')\big)}.
+    \end{equation}
+\end{itemize}
+
+\section{Experience Replay and Off-Policy Q-Learning Update}
+
+To improve sample efficiency and decorrelate sequential transitions, Q-learning stores experience tuples $(s_t, a_t, r_t, s_{t+1})$ collected across past policies into an \textbf{experience replay buffer} (dropping the oldest entries when full). Because the Bellman target depends only on the optimal next-state value rather than the behavior policy that generated the tuple, Q-learning operates \textbf{off-policy}.
+
+At each training iteration, a mini-batch of transitions $(s_i, a_i, r_i, s_{i+1})$ is sampled from the buffer, and the target value $y_i$ is computed using the frozen target network $\hat{Q}$:
+\begin{equation}
+    y_i = r_i + \max_a \hat{Q}(s_{i+1}, a).
+\end{equation}
+
+The parameters $\theta$ of the online network $Q_\theta$ are updated via regression to minimize the squared TD error toward $y_i$:
+\begin{equation}
+    \mathcal{L}(\theta) = \big(y_i - Q_\theta(s_i, a_i)\big)^2 = \left(r_i + \max_a \hat{Q}(s_{i+1}, a) - Q_\theta(s_i, a_i)\right)^2,
+\end{equation}
+and every $C$ updates the target network parameters are synchronized:
+\begin{equation}
+    \hat{Q} \leftarrow Q.
+\end{equation}
+
+\section{Summary of Notation}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Symbol} & \textbf{Definition} \\
+\midrule
+$\pi, \pi'$ & Current actor policy and greedy improved actor policy $\pi'(s) = \arg\max_a Q^\pi(s, a)$ \\
+$V^\pi(s)$ & State value function: expected cumulated return from state $s$ under policy $\pi$ \\
+$Q^\pi(s, a)$ & State-action value function: expected cumulated return after taking action $a$ in state $s$ \\
+$G_a, G_b$ & Empirical cumulated episode returns observed after visiting states $s_a, s_b$ \\
+$s_t, a_t, r_t, s_{t+1}$ & Experience transition tuple stored in the replay buffer \\
+$Q, \hat{Q}$ & Online Q-network being trained and frozen target Q-network \\
+$\varepsilon$ & Exploration probability hyperparameter in $\varepsilon$-greedy action selection \\
+$P(a \mid s)$ & Action sampling probability under Boltzmann exploration \\
+$y_i$ & Regression target $r_i + \max_a \hat{Q}(s_{i+1}, a)$ computed with the target network \\
+$C$ & Update interval (number of steps) between target network resets $\hat{Q} \leftarrow Q$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}

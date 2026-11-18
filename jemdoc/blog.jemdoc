@@ -1,9 +1,17 @@
 # jemdoc: menu{jemdoc/MENU}{blog/index.html}{../}
 # jemdoc: nofooter
 = Blog
-Short technical notes.
+Technical notes on machine learning and systems.
 
-== Posts
+== Deep Reinforcement Learning
+
+Lecture notes based on Prof. Hung-yi Lee’s course.
+
+- Nov. 18, 2026: [2026/drl-lecture-1-policy-gradient/index.html DRL Lecture 1: Policy Gradient]. Policy gradients, Monte Carlo estimation, baselines, and advantages.
+- Nov. 18, 2026: [2026/drl-lecture-2-ppo/index.html DRL Lecture 2: Proximal Policy Optimization]. Importance sampling, trust regions, and the PPO surrogate objectives.
+- Nov. 18, 2026: [2026/drl-lecture-3-q-learning/index.html DRL Lecture 3: Q-learning]. Value functions, temporal-difference learning, target networks, and replay.
+
+== Other Posts
 
 - Jul. 9, 2026: [2026/bpftrace-uprobe-stack/index.html Confirming Native Function Calls with bpftrace]. A reminder note for proving a native CUDA extension function is entered with uprobes and stack traces.
 - Jun. 16, 2026: [2026/mytransformers/index.html Transformer MT System: Core Math]. Core Transformer math for a small German-to-English MT exercise.
