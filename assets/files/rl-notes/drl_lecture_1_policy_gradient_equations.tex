@@ -34,37 +34,37 @@
 \section{Reinforcement Learning Interaction and Trajectory Probability}
 
 An actor is represented by a neural network policy $\pi$ with trainable parameters $\theta$. At time step $t$, given state (observation) $s_t$, the policy outputs a probability distribution over actions $a_t$:
-\begin{equation}
+\begin{equation}\label{eq:pg-policy}
     a_t \sim \pi_\theta(a_t \mid s_t) \quad \text{with action probability} \quad p_\theta(a_t \mid s_t).
 \end{equation}
 
 Over an episode of $T$ steps, the alternating interaction between the actor and the environment forms a trajectory $\tau$:
-\begin{equation}
+\begin{equation}\label{eq:pg-trajectory}
     \tau = \{s_1, a_1, s_2, a_2, \dots, s_T, a_T\}.
 \end{equation}
 
 The probability of observing trajectory $\tau$ under policy parameters $\theta$ factorizes into initial state probabilities, policy action probabilities, and environment state-transition probabilities:
 \begin{align}
     p_\theta(\tau) &= p(s_1)\, p_\theta(a_1 \mid s_1)\, p(s_2 \mid s_1, a_1)\, p_\theta(a_2 \mid s_2)\, p(s_3 \mid s_2, a_2) \cdots \nonumber \\
-    &= p(s_1) \prod_{t=1}^{T} p_\theta(a_t \mid s_t)\, p(s_{t+1} \mid s_t, a_t).
+    &= p(s_1) \prod_{t=1}^{T} p_\theta(a_t \mid s_t)\, p(s_{t+1} \mid s_t, a_t).\label{eq:pg-trajectory-probability}
 \end{align}
 
 \section{Total Reward and Expected Reward Objective}
 
 Each transition yields a scalar step reward $r_t$. The total reward accumulated over a single trajectory $\tau$ is:
-\begin{equation}
+\begin{equation}\label{eq:pg-episode-return}
     R(\tau) = \sum_{t=1}^{T} r_t.
 \end{equation}
 
 Because both the policy decisions and the environment transitions are stochastic, $R(\tau)$ is a random variable. The objective of policy gradient training is to maximize the expected total reward $\bar{R}_\theta$:
-\begin{equation}
+\begin{equation}\label{eq:pg-expected-return}
     \bar{R}_\theta = \sum_{\tau} R(\tau)\, p_\theta(\tau) = E_{\tau \sim p_\theta(\tau)}\big[R(\tau)\big].
 \end{equation}
 
 \section{Policy Gradient Derivation and Monte Carlo Estimation}
 
 To optimize $\bar{R}_\theta$ via gradient ascent without requiring $R(\tau)$ to be differentiable, the derivation applies the log-derivative identity:
-\begin{equation}
+\begin{equation}\label{eq:pg-log-derivative}
     \nabla \log f(x) = \frac{\nabla f(x)}{f(x)} \implies \nabla p_\theta(\tau) = p_\theta(\tau) \nabla \log p_\theta(\tau).
 \end{equation}
 
@@ -73,27 +73,27 @@ Taking the gradient of the expected reward with respect to $\theta$ gives:
     \nabla \bar{R}_\theta &= \sum_{\tau} R(\tau) \nabla p_\theta(\tau) \nonumber \\
     &= \sum_{\tau} R(\tau)\, p_\theta(\tau) \frac{\nabla p_\theta(\tau)}{p_\theta(\tau)} \nonumber \\
     &= \sum_{\tau} R(\tau)\, p_\theta(\tau) \nabla \log p_\theta(\tau) \nonumber \\
-    &= E_{\tau \sim p_\theta(\tau)}\big[R(\tau) \nabla \log p_\theta(\tau)\big].
+    &= E_{\tau \sim p_\theta(\tau)}\big[R(\tau) \nabla \log p_\theta(\tau)\big].\label{eq:pg-policy-gradient}
 \end{align}
 
 Taking the logarithm of $p_\theta(\tau)$ converts the product over time steps into a sum:
-\begin{equation}
+\begin{equation}\label{eq:pg-log-trajectory}
     \log p_\theta(\tau) = \log p(s_1) + \sum_{t=1}^{T} \log p_\theta(a_t \mid s_t) + \sum_{t=1}^{T} \log p(s_{t+1} \mid s_t, a_t).
 \end{equation}
 
 Because the initial state distribution $p(s_1)$ and the environment dynamics $p(s_{t+1} \mid s_t, a_t)$ do not depend on $\theta$, their gradients with respect to $\theta$ vanish:
-\begin{equation}
+\begin{equation}\label{eq:pg-trajectory-score}
     \nabla \log p_\theta(\tau) = \sum_{t=1}^{T} \nabla \log p_\theta(a_t \mid s_t).
 \end{equation}
 
 Approximating the expectation empirically by sampling $N$ trajectories $\{\tau^1, \tau^2, \dots, \tau^N\}$ using the current policy $\pi_\theta$, where trajectory $\tau^n$ has length $T_n$, yields the Monte Carlo policy gradient estimator:
 \begin{align}
     \nabla \bar{R}_\theta &\approx \frac{1}{N} \sum_{n=1}^{N} R(\tau^n) \nabla \log p_\theta(\tau^n) \nonumber \\
-    &= \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} R(\tau^n) \nabla \log p_\theta(a_t^n \mid s_t^n).
+    &= \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} R(\tau^n) \nabla \log p_\theta(a_t^n \mid s_t^n).\label{eq:pg-monte-carlo-gradient}
 \end{align}
 
 Using learning rate $\eta$, the policy parameters are updated by gradient ascent:
-\begin{equation}
+\begin{equation}\label{eq:pg-gradient-ascent}
     \theta \leftarrow \theta + \eta \nabla \bar{R}_\theta.
 \end{equation}
 
@@ -102,13 +102,13 @@ Using learning rate $\eta$, the policy parameters are updated by gradient ascent
 In automatic differentiation frameworks, policy gradient training mirrors standard multi-class classification where sampled actions $a_t^n$ serve as target labels for inputs $s_t^n$.
 
 For unweighted maximum log-likelihood classification, the objective and its gradient are:
-\begin{equation}
+\begin{equation}\label{eq:pg-maximum-likelihood}
     \mathcal{L}_{\text{MLE}}(\theta) = \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} \log p_\theta(a_t^n \mid s_t^n), \qquad
     \nabla \mathcal{L}_{\text{MLE}}(\theta) = \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} \nabla \log p_\theta(a_t^n \mid s_t^n).
 \end{equation}
 
 Multiplying each state-action log-probability term by its trajectory reward $R(\tau^n)$ produces the policy gradient surrogate objective and matching gradient:
-\begin{equation}
+\begin{equation}\label{eq:pg-weighted-log-likelihood}
     J(\theta) = \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} R(\tau^n) \log p_\theta(a_t^n \mid s_t^n), \qquad
     \nabla J(\theta) = \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} R(\tau^n) \nabla \log p_\theta(a_t^n \mid s_t^n).
 \end{equation}
@@ -118,37 +118,37 @@ Multiplying each state-action log-probability term by its trajectory reward $R(\
 \subsection*{Tip 1: Subtracting a Baseline}
 
 When all episode rewards $R(\tau^n)$ are positive, finite sampling reduces the probability of actions that happened not to be sampled. Subtracting a scalar baseline $b$ centers the reward weights so only better-than-average trajectories receive positive reinforcement:
-\begin{equation}
+\begin{equation}\label{eq:pg-baseline-gradient}
     \nabla \bar{R}_\theta \approx \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} \big(R(\tau^n) - b\big) \nabla \log p_\theta(a_t^n \mid s_t^n),
 \end{equation}
 where the baseline is commonly estimated using the expected episode return:
-\begin{equation}
+\begin{equation}\label{eq:pg-expected-return-baseline}
     b \approx E\big[R(\tau)\big].
 \end{equation}
 
 \subsection*{Tip 2: Assigning Suitable Credit (Reward-to-Go and Discounting)}
 
 Weighting action $a_t^n$ by the full episode reward $R(\tau^n)$ erroneously attributes rewards obtained prior to time step $t$ to action $a_t^n$. Replacing $R(\tau^n)$ with the reward-to-go from step $t$ to $T_n$ gives:
-\begin{equation}
+\begin{equation}\label{eq:pg-reward-to-go-gradient}
     \nabla \bar{R}_\theta \approx \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} \left( \sum_{t'=t}^{T_n} r_{t'}^n - b \right) \nabla \log p_\theta(a_t^n \mid s_t^n).
 \end{equation}
 
 To introduce discounting consistently, we now switch from the undiscounted objective $\bar{R}_\theta$ to the discounted episodic objective
-\begin{equation}
+\begin{equation}\label{eq:pg-discounted-objective}
     J_\gamma(\theta) = E_{\tau \sim p_\theta(\tau)}\left[\sum_{t=1}^{T} \gamma^{t-1} r_t\right], \qquad 0 < \gamma \le 1.
 \end{equation}
 Define the discounted reward-to-go from time $t$ as
-\begin{equation}
+\begin{equation}\label{eq:pg-discounted-return}
     G_t^\gamma = \sum_{k=t}^{T} \gamma^{k-t} r_k.
 \end{equation}
 For ordinary on-policy trajectory sampling, the exact policy gradient of this objective is
-\begin{equation}
+\begin{equation}\label{eq:pg-discounted-gradient}
     \nabla_\theta J_\gamma(\theta) = E_{\tau \sim p_\theta(\tau)}\left[\sum_{t=1}^{T} \gamma^{t-1} G_t^\gamma \, \nabla_\theta \log p_\theta(a_t \mid s_t)\right].
 \end{equation}
 The outer factor $\gamma^{t-1}$ discounts from the start of the episode, while $G_t^\gamma$ discounts relative to time $t$: their product assigns each future reward $r_k$ the objective's weight $\gamma^{k-1}$.
 
 A fixed, action-independent baseline $b_t(s_t)$ can be subtracted without changing the expectation. With $N$ on-policy trajectories, this gives the Monte Carlo estimator
-\begin{equation}
+\begin{equation}\label{eq:pg-discounted-monte-carlo-gradient}
     \nabla_\theta J_\gamma(\theta) \approx \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} \gamma^{t-1} \big(G_t^{\gamma,n} - b_t(s_t^n)\big) \, \nabla_\theta \log p_\theta(a_t^n \mid s_t^n).
 \end{equation}
 Here $G_t^{\gamma,n}$ is the discounted reward-to-go in trajectory $n$. Treat the baseline as fixed when taking the policy gradient. Setting $\gamma=1$ recovers the undiscounted reward-to-go estimator above. Keeping the undiscounted objective while inserting $\gamma<1$ only inside reward-to-go instead gives a generally biased approximation; it is not an exact reformulation of that objective.
@@ -157,16 +157,16 @@ Here $G_t^{\gamma,n}$ is the discounted reward-to-go in trajectory $n$. Treat th
 
 For the discounted objective, define time-dependent value and advantage functions (the time index accounts for the remaining horizon in a finite episode):
 \begin{align}
-    V_{\gamma,t}^\theta(s) &= E_{\pi_\theta}\big[G_t^\gamma \mid s_t=s\big], \\
-    Q_{\gamma,t}^\theta(s,a) &= E_{\pi_\theta}\big[G_t^\gamma \mid s_t=s, a_t=a\big], \\
-    A_{\gamma,t}^\theta(s,a) &= Q_{\gamma,t}^\theta(s,a) - V_{\gamma,t}^\theta(s).
+    V_{\gamma,t}^\theta(s) &= E_{\pi_\theta}\big[G_t^\gamma \mid s_t=s\big],\label{eq:pg-discounted-state-value} \\
+    Q_{\gamma,t}^\theta(s,a) &= E_{\pi_\theta}\big[G_t^\gamma \mid s_t=s, a_t=a\big],\label{eq:pg-discounted-action-value} \\
+    A_{\gamma,t}^\theta(s,a) &= Q_{\gamma,t}^\theta(s,a) - V_{\gamma,t}^\theta(s).\label{eq:pg-discounted-advantage}
 \end{align}
 The advantage measures how much better action $a$ is than the policy's average action at state $s$ and time $t$. The corresponding exact gradient retains the outer discount factor:
-\begin{equation}
+\begin{equation}\label{eq:pg-advantage-gradient}
     \nabla_\theta J_\gamma(\theta) = E_{\tau \sim p_\theta(\tau)}\left[\sum_{t=1}^{T} \gamma^{t-1} A_{\gamma,t}^\theta(s_t,a_t) \, \nabla_\theta \log p_\theta(a_t \mid s_t)\right].
 \end{equation}
 In practice, use estimated advantages, for example $\hat{A}_{\gamma,t}^n = G_t^{\gamma,n} - \hat{V}_{\gamma,t}(s_t^n)$ with a fixed critic baseline, and form
-\begin{equation}
+\begin{equation}\label{eq:pg-estimated-advantage-gradient}
     \nabla_\theta J_\gamma(\theta) \approx \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} \gamma^{t-1} \hat{A}_{\gamma,t}^n \, \nabla_\theta \log p_\theta(a_t^n \mid s_t^n).
 \end{equation}
 The advantage estimates are held fixed in the actor update; the policy gradient does not differentiate through them.

@@ -26,6 +26,15 @@ Use GitHub Pages with:
   corrections in sync with the paired jemdoc pages; the web pages retain
   the course attribution.
 
+## Equation numbering
+
+The shared MathJax configuration in `jemdoc/site.conf` numbers display equations
+automatically, starting at (1) on each page. Give each numbered equation a unique,
+descriptive `\label{eq:topic-name}`; references can use `\eqref{eq:topic-name}`.
+For an `align` environment, label each numbered row and retain `\nonumber` on
+intermediate derivation rows. Keep RL labels in sync with the downloadable `.tex`
+notes. Inline math remains unnumbered.
+
 ## Rebuild
 
 Install or download `jemdoc+MathJax` from

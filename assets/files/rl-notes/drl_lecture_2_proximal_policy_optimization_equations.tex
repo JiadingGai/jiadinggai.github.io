@@ -34,12 +34,12 @@
 \section{On-Policy Policy Gradient Recap and Bottleneck}
 
 In standard on-policy Policy Gradient, the actor policy $\pi_\theta$ interacts directly with the environment to collect trajectories, and the expected reward gradient is estimated using the advantage function $A^\theta(s_t, a_t)$:
-\begin{equation}
+\begin{equation}\label{eq:ppo-policy-gradient}
     \nabla \bar{R}_\theta = E_{\tau \sim p_\theta(\tau)}\big[R(\tau) \nabla \log p_\theta(\tau)\big] \approx \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} A^\theta(s_t^n, a_t^n) \nabla \log p_\theta(a_t^n \mid s_t^n).
 \end{equation}
 
 After a single gradient ascent update with learning rate $\eta$:
-\begin{equation}
+\begin{equation}\label{eq:ppo-gradient-ascent}
     \theta \leftarrow \theta + \eta \nabla \bar{R}_\theta,
 \end{equation}
 the policy distribution changes from $p_\theta$ to $p_{\theta_{\text{new}}}$, rendering previously sampled trajectories invalid for further updates. Converting on-policy training into off-policy training allows reusing trajectories collected by a fixed behavior policy $\pi_{\theta'}$.
@@ -47,7 +47,7 @@ the policy distribution changes from $p_\theta$ to $p_{\theta_{\text{new}}}$, re
 \section{Importance Sampling and Variance Analysis}
 
 Suppose we wish to estimate the expectation of $f(x)$ under a target distribution $p(x)$ from which direct sampling is difficult or unavailable:
-\begin{equation}
+\begin{equation}\label{eq:ppo-monte-carlo-expectation}
     E_{x \sim p}[f(x)] \approx \frac{1}{N} \sum_{i=1}^{N} f(x^i), \qquad x^i \sim p(x).
 \end{equation}
 
@@ -55,14 +55,14 @@ Using a proposal distribution $q(x)$ (with $q(x) > 0$ wherever $p(x) > 0$), the 
 \begin{align}
     E_{x \sim p}[f(x)] &= \int f(x) p(x)\, dx \nonumber \\
     &= \int f(x) \frac{p(x)}{q(x)} q(x)\, dx \nonumber \\
-    &= E_{x \sim q}\left[f(x) \frac{p(x)}{q(x)}\right].
+    &= E_{x \sim q}\left[f(x) \frac{p(x)}{q(x)}\right].\label{eq:ppo-importance-sampling}
 \end{align}
 
 Although both estimators share the same theoretical expectation, their variances differ. Using the variance identity $\operatorname{Var}[X] = E[X^2] - \big(E[X]\big)^2$:
 \begin{align}
-    \operatorname{Var}_{x \sim p}[f(x)] &= E_{x \sim p}\big[f(x)^2\big] - \big(E_{x \sim p}[f(x)]\big)^2, \\
+    \operatorname{Var}_{x \sim p}[f(x)] &= E_{x \sim p}\big[f(x)^2\big] - \big(E_{x \sim p}[f(x)]\big)^2,\label{eq:ppo-sampling-variance} \\
     \operatorname{Var}_{x \sim q}\left[f(x) \frac{p(x)}{q(x)}\right] &= E_{x \sim q}\left[\left(f(x) \frac{p(x)}{q(x)}\right)^2\right] - \left(E_{x \sim q}\left[f(x) \frac{p(x)}{q(x)}\right]\right)^2 \nonumber \\
-    &= E_{x \sim p}\left[f(x)^2 \frac{p(x)}{q(x)}\right] - \big(E_{x \sim p}[f(x)]\big)^2.
+    &= E_{x \sim p}\left[f(x)^2 \frac{p(x)}{q(x)}\right] - \big(E_{x \sim p}[f(x)]\big)^2.\label{eq:ppo-importance-sampling-variance}
 \end{align}
 
 When $p(x)$ and $q(x)$ diverge substantially, the ratio $\frac{p(x)}{q(x)}$ becomes large, inflating the variance of the importance-sampled estimator and causing severe approximation error under finite samples.
@@ -72,22 +72,22 @@ When $p(x)$ and $q(x)$ diverge substantially, the ratio $\frac{p(x)}{q(x)}$ beco
 Applying importance sampling to transition from the target policy $\pi_\theta$ (being optimized) to the behavior policy $\pi_{\theta'}$ (used to collect demonstrations) yields:
 \begin{align}
     \nabla \bar{R}_\theta &= E_{(s_t, a_t) \sim \pi_\theta}\big[A^\theta(s_t, a_t) \nabla \log p_\theta(a_t^n \mid s_t^n)\big] \nonumber \\
-    &= E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(s_t, a_t)}{p_{\theta'}(s_t, a_t)} A^\theta(s_t, a_t) \nabla \log p_\theta(a_t^n \mid s_t^n)\right].
+    &= E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(s_t, a_t)}{p_{\theta'}(s_t, a_t)} A^\theta(s_t, a_t) \nabla \log p_\theta(a_t^n \mid s_t^n)\right].\label{eq:ppo-joint-importance-gradient}
 \end{align}
 
 Factorizing the joint state-action probability $p_\theta(s_t, a_t) = p_\theta(a_t \mid s_t) p_\theta(s_t)$ and substituting $A^{\theta'}(s_t, a_t)$ (evaluated from trajectories gathered under $\theta'$):
-\begin{equation}
+\begin{equation}\label{eq:ppo-factorized-importance-gradient}
     \nabla \bar{R}_\theta = E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} \frac{p_\theta(s_t)}{p_{\theta'}(s_t)} A^{\theta'}(s_t, a_t) \nabla \log p_\theta(a_t^n \mid s_t^n)\right].
 \end{equation}
 
 Assuming state visitation probabilities are approximately unchanged between nearby policies ($p_\theta(s_t) \approx p_{\theta'}(s_t)$, so $\frac{p_\theta(s_t)}{p_{\theta'}(s_t)} \approx 1$) and using $\nabla p_\theta(a_t \mid s_t) = p_\theta(a_t \mid s_t) \nabla \log p_\theta(a_t \mid s_t)$:
 \begin{align}
     \nabla \bar{R}_\theta &\approx E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t) \nabla \log p_\theta(a_t \mid s_t)\right] \nonumber \\
-    &= E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{\nabla p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t)\right].
+    &= E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{\nabla p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t)\right].\label{eq:ppo-surrogate-gradient}
 \end{align}
 
 Integrating with respect to $\theta$ gives the off-policy surrogate objective function $J^{\theta'}(\theta)$:
-\begin{equation}
+\begin{equation}\label{eq:ppo-surrogate-objective}
     J^{\theta'}(\theta) = E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t)\right].
 \end{equation}
 
@@ -98,31 +98,31 @@ Because importance sampling requires $\pi_\theta$ and $\pi_{\theta'}$ to remain 
 \subsection*{Trust Region Policy Optimization (TRPO)}
 
 TRPO maximizes $J^{\theta'}(\theta)$ subject to an explicit hard trust-region constraint on the KL divergence:
-\begin{equation}
+\begin{equation}\label{eq:ppo-trpo-objective}
     J_{\text{TRPO}}^{\theta'}(\theta) = E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t)\right], \qquad \text{s.t. } \operatorname{KL}(\theta, \theta') < \delta.
 \end{equation}
 
 \subsection*{PPO1: Adaptive KL Penalty}
 
 PPO1 incorporates the KL divergence directly into the objective as a soft penalty weighted by an adaptive coefficient $\beta$:
-\begin{equation}
+\begin{equation}\label{eq:ppo-kl-penalty-objective}
     J_{\text{PPO}}^{\theta'}(\theta) = J^{\theta'}(\theta) - \beta \operatorname{KL}(\theta, \theta').
 \end{equation}
 
 During training, $\beta$ is dynamically adjusted after each update by comparing the realized divergence $\operatorname{KL}(\theta, \theta')$ against target bounds $\operatorname{KL}_{\max}$ and $\operatorname{KL}_{\min}$:
 \begin{align}
-    \text{If } \operatorname{KL}(\theta, \theta') > \operatorname{KL}_{\max}, \quad &\text{increase } \beta \quad (\text{e.g., } \beta \leftarrow 2\beta), \\
-    \text{If } \operatorname{KL}(\theta, \theta') < \operatorname{KL}_{\min}, \quad &\text{decrease } \beta \quad (\text{e.g., } \beta \leftarrow \beta / 2).
+    \text{If } \operatorname{KL}(\theta, \theta') > \operatorname{KL}_{\max}, \quad &\text{increase } \beta \quad (\text{e.g., } \beta \leftarrow 2\beta),\label{eq:ppo-increase-penalty} \\
+    \text{If } \operatorname{KL}(\theta, \theta') < \operatorname{KL}_{\min}, \quad &\text{decrease } \beta \quad (\text{e.g., } \beta \leftarrow \beta / 2).\label{eq:ppo-decrease-penalty}
 \end{align}
 
 \subsection*{PPO2: Clipped Surrogate Objective}
 
 To avoid computing KL divergences explicitly, PPO2 enforces proximity by clipping the probability ratio $\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)}$ within $[1 - \epsilon, 1 + \epsilon]$:
-\begin{equation}
+\begin{equation}\label{eq:ppo-clipped-objective}
     J_{\text{PPO2}}^{\theta'}(\theta) \approx \sum_{(s_t, a_t)} \min\left( \frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t),\; \operatorname{clip}\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 - \epsilon,\; 1 + \epsilon\right) A^{\theta'}(s_t, a_t) \right),
 \end{equation}
 where the clipping function is defined as:
-\begin{equation}
+\begin{equation}\label{eq:ppo-clipping-function}
     \operatorname{clip}(r, 1 - \epsilon, 1 + \epsilon) = \begin{cases}
         1 - \epsilon, & r < 1 - \epsilon, \\
         r, & 1 - \epsilon \le r \le 1 + \epsilon, \\
@@ -132,8 +132,8 @@ where the clipping function is defined as:
 
 Taking the minimum between the unclipped and clipped terms yields two distinct regimes depending on the sign of $A^{\theta'}(s_t, a_t)$:
 \begin{align}
-    \text{Case 1 } \big(A^{\theta'}(s_t, a_t) > 0\big): \quad & \min\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 + \epsilon\right) A^{\theta'}(s_t, a_t), \\
-    \text{Case 2 } \big(A^{\theta'}(s_t, a_t) < 0\big): \quad & \max\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 - \epsilon\right) A^{\theta'}(s_t, a_t).
+    \text{Case 1 } \big(A^{\theta'}(s_t, a_t) > 0\big): \quad & \min\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 + \epsilon\right) A^{\theta'}(s_t, a_t),\label{eq:ppo-positive-advantage} \\
+    \text{Case 2 } \big(A^{\theta'}(s_t, a_t) < 0\big): \quad & \max\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 - \epsilon\right) A^{\theta'}(s_t, a_t).\label{eq:ppo-negative-advantage}
 \end{align}
 When $A^{\theta'} > 0$, increasing $p_\theta(a_t \mid s_t)$ yields no additional objective gain once the ratio exceeds $1 + \epsilon$. When $A^{\theta'} < 0$, decreasing $p_\theta(a_t \mid s_t)$ yields no additional objective gain once the ratio drops below $1 - \epsilon$.
 

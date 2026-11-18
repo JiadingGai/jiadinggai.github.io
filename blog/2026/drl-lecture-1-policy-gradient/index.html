@@ -7,11 +7,11 @@
 <meta name="description" content="DRL Lecture 1: Policy Gradient: Policy gradients, Monte Carlo estimation, baselines, and advantages." />
 <link rel="canonical" href="https://jiadinggai.github.io/blog/2026/drl-lecture-1-policy-gradient/" />
 <link rel="icon" type="image/svg+xml" href="/assets/img/church-lambda-icon.svg" />
-<link rel="stylesheet" href="/assets/css/jemdoc.css" type="text/css" />
+<link rel="stylesheet" href="/assets/css/jemdoc.css?v=20261118-equations" type="text/css" />
 <title>DRL Lecture 1: Policy Gradient | Jiading Gai</title>
 <script>
 window.MathJax = {
-  tex: { inlineMath: [["$", "$"], ["\\(", "\\)"]], displayMath: [["$$", "$$"], ["\\[", "\\]"]] },
+  tex: { tags: "all", useLabelIds: true, inlineMath: [["$", "$"], ["\\(", "\\)"]], displayMath: [["$$", "$$"], ["\\[", "\\]"]] },
   svg: { fontCache: "global" }
 };
 </script>
@@ -62,7 +62,7 @@ window.MathJax = {
 <p>An actor is represented by a neural network policy $\pi$ with trainable parameters $\theta$. At time step $t$, given state (observation) $s_t$, the policy outputs a probability distribution over actions $a_t$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-policy}
     a_t \sim \pi_\theta(a_t \mid s_t) \quad \text{with action probability} \quad p_\theta(a_t \mid s_t).
 \end{equation}
 </div>
@@ -70,7 +70,7 @@ window.MathJax = {
 <p>Over an episode of $T$ steps, the alternating interaction between the actor and the environment forms a trajectory $\tau$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-trajectory}
     \tau = \{s_1, a_1, s_2, a_2, \dots, s_T, a_T\}.
 \end{equation}
 </div>
@@ -80,7 +80,7 @@ window.MathJax = {
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
 \begin{align}
     p_\theta(\tau) &amp;= p(s_1)\, p_\theta(a_1 \mid s_1)\, p(s_2 \mid s_1, a_1)\, p_\theta(a_2 \mid s_2)\, p(s_3 \mid s_2, a_2) \cdots \nonumber \\
-    &amp;= p(s_1) \prod_{t=1}^{T} p_\theta(a_t \mid s_t)\, p(s_{t+1} \mid s_t, a_t).
+    &amp;= p(s_1) \prod_{t=1}^{T} p_\theta(a_t \mid s_t)\, p(s_{t+1} \mid s_t, a_t).\label{eq:pg-trajectory-probability}
 \end{align}
 </div>
 
@@ -89,7 +89,7 @@ window.MathJax = {
 <p>Each transition yields a scalar step reward $r_t$. The total reward accumulated over a single trajectory $\tau$ is:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-episode-return}
     R(\tau) = \sum_{t=1}^{T} r_t.
 \end{equation}
 </div>
@@ -97,7 +97,7 @@ window.MathJax = {
 <p>Because both the policy decisions and the environment transitions are stochastic, $R(\tau)$ is a random variable. The objective of policy gradient training is to maximize the expected total reward $\bar{R}_\theta$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-expected-return}
     \bar{R}_\theta = \sum_{\tau} R(\tau)\, p_\theta(\tau) = E_{\tau \sim p_\theta(\tau)}\big[R(\tau)\big].
 \end{equation}
 </div>
@@ -107,7 +107,7 @@ window.MathJax = {
 <p>To optimize $\bar{R}_\theta$ via gradient ascent without requiring $R(\tau)$ to be differentiable, the derivation applies the log-derivative identity:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-log-derivative}
     \nabla \log f(x) = \frac{\nabla f(x)}{f(x)} \implies \nabla p_\theta(\tau) = p_\theta(\tau) \nabla \log p_\theta(\tau).
 \end{equation}
 </div>
@@ -119,14 +119,14 @@ window.MathJax = {
     \nabla \bar{R}_\theta &amp;= \sum_{\tau} R(\tau) \nabla p_\theta(\tau) \nonumber \\
     &amp;= \sum_{\tau} R(\tau)\, p_\theta(\tau) \frac{\nabla p_\theta(\tau)}{p_\theta(\tau)} \nonumber \\
     &amp;= \sum_{\tau} R(\tau)\, p_\theta(\tau) \nabla \log p_\theta(\tau) \nonumber \\
-    &amp;= E_{\tau \sim p_\theta(\tau)}\big[R(\tau) \nabla \log p_\theta(\tau)\big].
+    &amp;= E_{\tau \sim p_\theta(\tau)}\big[R(\tau) \nabla \log p_\theta(\tau)\big].\label{eq:pg-policy-gradient}
 \end{align}
 </div>
 
 <p>Taking the logarithm of $p_\theta(\tau)$ converts the product over time steps into a sum:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-log-trajectory}
     \log p_\theta(\tau) = \log p(s_1) + \sum_{t=1}^{T} \log p_\theta(a_t \mid s_t) + \sum_{t=1}^{T} \log p(s_{t+1} \mid s_t, a_t).
 \end{equation}
 </div>
@@ -134,7 +134,7 @@ window.MathJax = {
 <p>Because the initial state distribution $p(s_1)$ and the environment dynamics $p(s_{t+1} \mid s_t, a_t)$ do not depend on $\theta$, their gradients with respect to $\theta$ vanish:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-trajectory-score}
     \nabla \log p_\theta(\tau) = \sum_{t=1}^{T} \nabla \log p_\theta(a_t \mid s_t).
 \end{equation}
 </div>
@@ -144,14 +144,14 @@ window.MathJax = {
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
 \begin{align}
     \nabla \bar{R}_\theta &amp;\approx \frac{1}{N} \sum_{n=1}^{N} R(\tau^n) \nabla \log p_\theta(\tau^n) \nonumber \\
-    &amp;= \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} R(\tau^n) \nabla \log p_\theta(a_t^n \mid s_t^n).
+    &amp;= \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} R(\tau^n) \nabla \log p_\theta(a_t^n \mid s_t^n).\label{eq:pg-monte-carlo-gradient}
 \end{align}
 </div>
 
 <p>Using learning rate $\eta$, the policy parameters are updated by gradient ascent:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-gradient-ascent}
     \theta \leftarrow \theta + \eta \nabla \bar{R}_\theta.
 \end{equation}
 </div>
@@ -162,7 +162,7 @@ window.MathJax = {
 <p>For unweighted maximum log-likelihood classification, the objective and its gradient are:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-maximum-likelihood}
     \mathcal{L}_{\text{MLE}}(\theta) = \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} \log p_\theta(a_t^n \mid s_t^n), \qquad
     \nabla \mathcal{L}_{\text{MLE}}(\theta) = \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} \nabla \log p_\theta(a_t^n \mid s_t^n).
 \end{equation}
@@ -171,7 +171,7 @@ window.MathJax = {
 <p>Multiplying each state-action log-probability term by its trajectory reward $R(\tau^n)$ produces the policy gradient surrogate objective and matching gradient:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-weighted-log-likelihood}
     J(\theta) = \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} R(\tau^n) \log p_\theta(a_t^n \mid s_t^n), \qquad
     \nabla J(\theta) = \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} R(\tau^n) \nabla \log p_\theta(a_t^n \mid s_t^n).
 \end{equation}
@@ -184,7 +184,7 @@ window.MathJax = {
 <p>When all episode rewards $R(\tau^n)$ are positive, finite sampling reduces the probability of actions that happened not to be sampled. Subtracting a scalar baseline $b$ centers the reward weights so only better-than-average trajectories receive positive reinforcement:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-baseline-gradient}
     \nabla \bar{R}_\theta \approx \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} \big(R(\tau^n) - b\big) \nabla \log p_\theta(a_t^n \mid s_t^n),
 \end{equation}
 </div>
@@ -192,7 +192,7 @@ window.MathJax = {
 <p>where the baseline is commonly estimated using the expected episode return:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-expected-return-baseline}
     b \approx E\big[R(\tau)\big].
 \end{equation}
 </div>
@@ -202,7 +202,7 @@ window.MathJax = {
 <p>Weighting action $a_t^n$ by the full episode reward $R(\tau^n)$ erroneously attributes rewards obtained prior to time step $t$ to action $a_t^n$. Replacing $R(\tau^n)$ with the reward-to-go from step $t$ to $T_n$ gives:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-reward-to-go-gradient}
     \nabla \bar{R}_\theta \approx \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} \left( \sum_{t'=t}^{T_n} r_{t'}^n - b \right) \nabla \log p_\theta(a_t^n \mid s_t^n).
 \end{equation}
 </div>
@@ -210,7 +210,7 @@ window.MathJax = {
 <p>To introduce discounting consistently, we now switch from the undiscounted objective $\bar{R}_\theta$ to the discounted episodic objective</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-discounted-objective}
     J_\gamma(\theta) = E_{\tau \sim p_\theta(\tau)}\left[\sum_{t=1}^{T} \gamma^{t-1} r_t\right], \qquad 0 &lt; \gamma \le 1.
 \end{equation}
 </div>
@@ -218,7 +218,7 @@ window.MathJax = {
 <p>Define the discounted reward-to-go from time $t$ as</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-discounted-return}
     G_t^\gamma = \sum_{k=t}^{T} \gamma^{k-t} r_k.
 \end{equation}
 </div>
@@ -226,7 +226,7 @@ window.MathJax = {
 <p>For ordinary on-policy trajectory sampling, the exact policy gradient of this objective is</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-discounted-gradient}
     \nabla_\theta J_\gamma(\theta) = E_{\tau \sim p_\theta(\tau)}\left[\sum_{t=1}^{T} \gamma^{t-1} G_t^\gamma \, \nabla_\theta \log p_\theta(a_t \mid s_t)\right].
 \end{equation}
 </div>
@@ -235,7 +235,7 @@ window.MathJax = {
 <p>A fixed, action-independent baseline $b_t(s_t)$ can be subtracted without changing the expectation. With $N$ on-policy trajectories, this gives the Monte Carlo estimator</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-discounted-monte-carlo-gradient}
     \nabla_\theta J_\gamma(\theta) \approx \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} \gamma^{t-1} \big(G_t^{\gamma,n} - b_t(s_t^n)\big) \, \nabla_\theta \log p_\theta(a_t^n \mid s_t^n).
 \end{equation}
 </div>
@@ -248,16 +248,16 @@ window.MathJax = {
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
 \begin{align}
-    V_{\gamma,t}^\theta(s) &amp;= E_{\pi_\theta}\big[G_t^\gamma \mid s_t=s\big], \\
-    Q_{\gamma,t}^\theta(s,a) &amp;= E_{\pi_\theta}\big[G_t^\gamma \mid s_t=s, a_t=a\big], \\
-    A_{\gamma,t}^\theta(s,a) &amp;= Q_{\gamma,t}^\theta(s,a) - V_{\gamma,t}^\theta(s).
+    V_{\gamma,t}^\theta(s) &amp;= E_{\pi_\theta}\big[G_t^\gamma \mid s_t=s\big],\label{eq:pg-discounted-state-value} \\
+    Q_{\gamma,t}^\theta(s,a) &amp;= E_{\pi_\theta}\big[G_t^\gamma \mid s_t=s, a_t=a\big],\label{eq:pg-discounted-action-value} \\
+    A_{\gamma,t}^\theta(s,a) &amp;= Q_{\gamma,t}^\theta(s,a) - V_{\gamma,t}^\theta(s).\label{eq:pg-discounted-advantage}
 \end{align}
 </div>
 
 <p>The advantage measures how much better action $a$ is than the policy's average action at state $s$ and time $t$. The corresponding exact gradient retains the outer discount factor:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-advantage-gradient}
     \nabla_\theta J_\gamma(\theta) = E_{\tau \sim p_\theta(\tau)}\left[\sum_{t=1}^{T} \gamma^{t-1} A_{\gamma,t}^\theta(s_t,a_t) \, \nabla_\theta \log p_\theta(a_t \mid s_t)\right].
 \end{equation}
 </div>
@@ -265,7 +265,7 @@ window.MathJax = {
 <p>In practice, use estimated advantages, for example $\hat{A}_{\gamma,t}^n = G_t^{\gamma,n} - \hat{V}_{\gamma,t}(s_t^n)$ with a fixed critic baseline, and form</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:pg-estimated-advantage-gradient}
     \nabla_\theta J_\gamma(\theta) \approx \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} \gamma^{t-1} \hat{A}_{\gamma,t}^n \, \nabla_\theta \log p_\theta(a_t^n \mid s_t^n).
 \end{equation}
 </div>

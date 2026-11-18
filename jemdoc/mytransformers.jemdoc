@@ -24,15 +24,19 @@ h = self.dropout(h)
 src_mask = (src != self.src_pad_idx).unsqueeze(1).unsqueeze(2)
 trg_mask = trg_pad_mask & torch.tril(torch.ones((trg_len, trg_len), device=self.device)).bool()</code></pre>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-embeddings}
 h_x^0 = E_x[x]\sqrt{d_{\mathrm{model}}}+P_x,\qquad
 h_y^0 = E_y[y]\sqrt{d_{\mathrm{model}}}+P_y
 $$
+</div>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-masks}
 M_x(i)=1[x_i \ne \mathrm{pad}],\qquad
 M_y(i,j)=1[y_i \ne \mathrm{pad}]\,1[j \le i]
 $$
+</div>
 
 <h2>Scaled Dot-Product And Multi-Head Attention</h2>
 <pre><code class="language-python"># MultiHeadAttentionLayer.forward
@@ -42,16 +46,20 @@ energy = energy.masked_fill(mask == 0, -1e10)
 attention = torch.softmax(energy, dim=-1)
 x = torch.matmul(self.dropout(attention), V)</code></pre>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-scaled-dot-product-attention}
 \mathrm{Attn}(Q,K,V;M)=
 \mathrm{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}+M\right)V
 $$
+</div>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-multi-head-attention}
 \mathrm{MHA}(H_q,H_k,H_v)=
 \mathrm{Concat}(A_1,\ldots,A_h)W^O,\qquad
 A_r=\mathrm{Attn}(H_qW_r^Q,H_kW_r^K,H_vW_r^V;M)
 $$
+</div>
 
 <h2>Encoder Layer</h2>
 <pre><code class="language-python"># EncoderLayer.forward
@@ -60,16 +68,20 @@ src = self.self_attn_layer_norm(src + self.dropout(_src))
 _src = self.positionwise_feedforward(src)
 src = self.ff_layer_norm(src + self.dropout(_src))</code></pre>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-encoder-attention}
 \tilde{h}_x^\ell=\mathrm{LN}\left(h_x^{\ell-1}+
 \mathrm{MHA}(h_x^{\ell-1},h_x^{\ell-1},h_x^{\ell-1})\right)
 $$
+</div>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-encoder-feed-forward}
 h_x^\ell=\mathrm{LN}\left(\tilde{h}_x^\ell+
 \mathrm{FFN}(\tilde{h}_x^\ell)\right),\qquad
 \mathrm{FFN}(z)=\mathrm{ReLU}(zW_1+b_1)W_2+b_2
 $$
+</div>
 
 <h2>Encoder-Decoder Interaction</h2>
 <p>The encoder output $H_x=h_x^L$ becomes the decoder cross-attention memory.</p>
@@ -83,20 +95,26 @@ trg = self.self_attn_layer_norm(trg + self.dropout(_trg))
 _trg, attention = self.encoder_attention(trg, enc_src, enc_src, src_mask)
 trg = self.enc_attn_layer_norm(trg + self.dropout(_trg))</code></pre>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-decoder-self-attention}
 \tilde{h}_y^\ell=\mathrm{LN}\left(h_y^{\ell-1}+
 \mathrm{MHA}(h_y^{\ell-1},h_y^{\ell-1},h_y^{\ell-1})\right)
 $$
+</div>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-decoder-cross-attention}
 \bar{h}_y^\ell=\mathrm{LN}\left(\tilde{h}_y^\ell+
 \mathrm{MHA}(\tilde{h}_y^\ell,H_x,H_x)\right)
 $$
+</div>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-decoder-feed-forward}
 h_y^\ell=\mathrm{LN}\left(\bar{h}_y^\ell+
 \mathrm{FFN}(\bar{h}_y^\ell)\right)
 $$
+</div>
 
 <h2>Training Objective</h2>
 <p>Training minimizes teacher-forced token cross-entropy. In <code>mytransformers.py</code>, the decoder consumes <code>trg[:, :-1]</code>, predicts <code>trg[:, 1:]</code>, ignores <code>&lt;pad&gt;</code> positions in <code>nn.CrossEntropyLoss</code>, clips gradients, and updates with Adam.</p>
@@ -105,16 +123,20 @@ output = output.contiguous().view(-1, output_dim)
 trg = trg[:, 1:].contiguous().view(-1)
 loss = nn.CrossEntropyLoss(ignore_index=TRG_PAD_IDX)(output, trg)</code></pre>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-token-distribution}
 p_\theta(y_t \mid y_{1:t-1},x)=
 \mathrm{softmax}(h_{y,t}^L W_{\mathrm{vocab}}+b)
 $$
+</div>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-training-objective}
 \mathcal{L}=-\sum_t \log p_\theta(y_t \mid y_{1:t-1}, x),
 \qquad
 p_\theta(y\mid x)=\prod_t p_\theta(y_t \mid y_{1:t-1},x)
 $$
+</div>
 
 <h2>Training System</h2>
 <p>The implemented training system initializes weights with Xavier uniform, builds padded <code>DataLoader</code> batches, trains with Adam at <code>LEARNING_RATE = 0.0005</code>, and uses <code>nn.CrossEntropyLoss(ignore_index=TRG_PAD_IDX)</code>. Each step zeroes gradients, runs teacher-forced decoding on <code>trg[:, :-1]</code>, flattens logits and targets, backpropagates, clips gradients with <code>CLIP = 1</code>, steps the optimizer, and optionally prints step loss plus running average loss through <code>LOSS_LOG_EVERY</code>.</p>
@@ -128,24 +150,29 @@ output, attention = model.decoder(trg_tensor, enc_src, trg_mask, src_mask)
 pred_token = output.argmax(2)[:, -1].item()
 trg_indexes.append(pred_token)</code></pre>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-greedy-decoding}
 \hat{y}_t=\arg\max_v p_\theta(v \mid \hat{y}_{1:t-1},x)
 $$
+</div>
 
 <h2>BLEU Evaluation</h2>
 <p>Validation uses <code>evaluate</code>, <code>calculate_bleu</code>, and local <code>corpus_bleu</code>; BLEU is an unsmoothed sanity check, not a standardized benchmark score.</p>
 
 <p>For a dataset $D=\{(x_i,y_i)\}_{i=1}^{m}$, <code>calculate_bleu</code> greedily decodes candidates $\hat{C}_i$ and uses one reference set $R_i$ per candidate:</p>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-corpus-bleu}
 C = \{\hat{C}_i\}_{i=1}^{m},\qquad
 R = \{R_i\}_{i=1}^{m},\qquad
 B_D = B(C,R)
 $$
+</div>
 
 <p>For $N=4$ and uniform weights $w_n=\frac{1}{4}$, modified n-gram precision uses clipped counts:</p>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-ngram-precision}
 p_n =
 \frac{
   \sum_i \sum_{g \in G_n(\hat{C}_i)}
@@ -154,19 +181,24 @@ p_n =
   \sum_i \max(|\hat{C}_i| - n + 1, 0)
 }
 $$
+</div>
 
 <p>With total candidate length $c$ and closest-reference total length $r$, the brevity penalty and BLEU score are:</p>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-brevity-penalty}
 BP = \exp(\min(1 - \frac{r}{c}, 0)),
 \qquad
 c = \sum_i |\hat{C}_i|
 $$
+</div>
 
-$$
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+$$\label{eq:transformer-bleu}
 BLEU =
 BP \cdot \exp(\frac{1}{4}\sum_{n=1}^{4}\log p_n)
 $$
+</div>
 
 <p>Because the implementation is unsmoothed, it returns <code>0.0</code> when $c=0$ or when any clipped n-gram count is zero.</p>
 

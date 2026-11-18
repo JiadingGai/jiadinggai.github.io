@@ -29,7 +29,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p>Unlike an actor that directly outputs actions, a critic evaluates how good a given actor policy $\pi$ is. The <strong>state value function</strong> $V^\pi(s)$ is defined as the expected cumulated reward obtained after visiting state $s$ and following actor $\pi$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-state-value}
     V^\pi(s) = E_\pi\left[\sum_{t'=t}^{T} r_{t'} \;\middle|\; s_t = s\right].
 \end{equation}
 </div>
@@ -43,7 +43,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p><strong>Monte-Carlo (MC) Approach:</strong> The critic observes $\pi$ playing until the end of an episode. After visiting state $s_a$, let the total cumulated reward until episode termination be $G_a$ (and $G_b$ after visiting $s_b$). The critic is trained via regression toward these observed episode returns:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-monte-carlo-value}
         V^\pi(s_a) \approx G_a, \qquad V^\pi(s_b) \approx G_b.
     \end{equation}
 </div>
@@ -55,7 +55,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p><strong>Temporal-Difference (TD) Approach:</strong> Using a single transition $(s_t, a_t, r_t, s_{t+1})$, the state value function satisfies the Bellman consistency relation:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-td-value-relation}
         V^\pi(s_t) = V^\pi(s_{t+1}) + r_t \iff V^\pi(s_t) - V^\pi(s_{t+1}) = r_t.
     \end{equation}
 </div>
@@ -71,7 +71,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p>In Monte-Carlo estimation, $G_a$ is a summation of stochastic rewards over many steps, producing larger variance because variance scales quadratically with scale and step accumulation:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-variance-scaling}
     \operatorname{Var}(kX) = k^2 \operatorname{Var}(X).
 \end{equation}
 </div>
@@ -80,7 +80,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p>For the 8-episode benchmark (Sutton Example 6.4) consisting of one trajectory $(s_a, r=0, s_b, r=0, \text{END})$, six trajectories $(s_b, r=1, \text{END})$, and one trajectory $(s_b, r=0, \text{END})$, both estimators agree on $V^\pi(s_b) = \frac{3}{4}$, whereas their estimates at $s_a$ differ:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-mc-td-example}
     \text{Monte-Carlo:} \quad V^\pi(s_a) = 0, \qquad
     \text{Temporal-Difference:} \quad V^\pi(s_a) = V^\pi(s_b) + r = \frac{3}{4} + 0 = \frac{3}{4}.
 \end{equation}
@@ -91,7 +91,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p>The <strong>state-action value function</strong> $Q^\pi(s, a)$ measures the expected cumulated reward obtained after taking action $a$ in state $s$ and subsequently following actor $\pi$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-action-value}
     Q^\pi(s, a) = E_\pi\left[\sum_{t'=t}^{T} r_{t'} \;\middle|\; s_t = s, a_t = a\right].
 \end{equation}
 </div>
@@ -99,7 +99,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p>Given $Q^\pi(s, a)$ for a discrete action space, Q-learning defines a new deterministic actor $\pi'$ with no additional network parameters by selecting the action that maximizes $Q^\pi(s, a)$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-greedy-policy}
     \pi'(s) = \arg\max_a Q^\pi(s, a).
 \end{equation}
 </div>
@@ -109,7 +109,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p>The greedy policy $\pi'$ is guaranteed to outperform or match $\pi$ across every state, i.e., $V^{\pi'}(s) \ge V^\pi(s)$ for all $s$. By definition of $\pi'$, at any state $s$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-greedy-improvement}
     V^\pi(s) = Q^\pi\big(s, \pi(s)\big) \le \max_a Q^\pi(s, a) = Q^\pi\big(s, \pi'(s)\big).
 \end{equation}
 </div>
@@ -124,7 +124,7 @@ Value functions, temporal-difference learning, target networks, and replay.
     &amp;= E\Big[r_{t+1} + r_{t+2} + V^\pi(s_{t+2}) \;\Big|\; s_t = s, a_t = \pi'(s_t), a_{t+1} = \pi'(s_{t+1})\Big] \nonumber \\
     &amp;\le E\Big[r_{t+1} + r_{t+2} + Q^\pi\big(s_{t+2}, \pi'(s_{t+2})\big) \;\Big|\; s_t = s, a_t = \pi'(s_t), a_{t+1} = \pi'(s_{t+1})\Big] \nonumber \\
     &amp;\;\;\vdots \nonumber \\
-    &amp;\le V^{\pi'}(s).
+    &amp;\le V^{\pi'}(s).\label{eq:q-policy-improvement-proof}
 \end{align}
 </div>
 
@@ -135,7 +135,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p>For a transition $(s_t, a_t, r_t, s_{t+1})$, the TD relation for the state-action value function is:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-q-value-relation}
     Q^\pi(s_t, a_t) = r_t + Q^\pi\big(s_{t+1}, \pi(s_{t+1})\big).
 \end{equation}
 </div>
@@ -153,7 +153,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p><strong>Epsilon-Greedy ($\varepsilon$-Greedy) Exploration</strong> (where $\varepsilon$ typically decays during training):</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-epsilon-greedy}
         a = \begin{cases}
             \arg\max_a Q(s, a), &amp; \text{with probability } 1 - \varepsilon, \\
             \text{random action}, &amp; \text{otherwise (with probability } \varepsilon\text{)}.
@@ -168,7 +168,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p><strong>Boltzmann Exploration:</strong> Actions are sampled according to a softmax distribution over Q-values:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-boltzmann-policy}
         P(a \mid s) = \frac{\exp\big(Q(s, a)\big)}{\sum_{a'} \exp\big(Q(s, a')\big)}.
     \end{equation}
 </div>
@@ -183,7 +183,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p>At each training iteration, a mini-batch of transitions $(s_i, a_i, r_i, s_{i+1})$ is sampled from the buffer, and the target value $y_i$ is computed using the frozen target network $\hat{Q}$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-dqn-target}
     y_i = r_i + \max_a \hat{Q}(s_{i+1}, a).
 \end{equation}
 </div>
@@ -191,7 +191,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p>The parameters $\theta$ of the online network $Q_\theta$ are updated via regression to minimize the squared TD error toward $y_i$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-dqn-loss}
     \mathcal{L}(\theta) = \big(y_i - Q_\theta(s_i, a_i)\big)^2 = \left(r_i + \max_a \hat{Q}(s_{i+1}, a) - Q_\theta(s_i, a_i)\right)^2,
 \end{equation}
 </div>
@@ -199,7 +199,7 @@ Value functions, temporal-difference learning, target networks, and replay.
 <p>and every $C$ updates the target network parameters are synchronized:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:q-target-network-update}
     \hat{Q} \leftarrow Q.
 \end{equation}
 </div>

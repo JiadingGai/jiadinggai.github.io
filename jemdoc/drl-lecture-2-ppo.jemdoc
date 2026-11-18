@@ -29,7 +29,7 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 <p>In standard on-policy Policy Gradient, the actor policy $\pi_\theta$ interacts directly with the environment to collect trajectories, and the expected reward gradient is estimated using the advantage function $A^\theta(s_t, a_t)$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:ppo-policy-gradient}
     \nabla \bar{R}_\theta = E_{\tau \sim p_\theta(\tau)}\big[R(\tau) \nabla \log p_\theta(\tau)\big] \approx \frac{1}{N} \sum_{n=1}^{N} \sum_{t=1}^{T_n} A^\theta(s_t^n, a_t^n) \nabla \log p_\theta(a_t^n \mid s_t^n).
 \end{equation}
 </div>
@@ -37,7 +37,7 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 <p>After a single gradient ascent update with learning rate $\eta$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:ppo-gradient-ascent}
     \theta \leftarrow \theta + \eta \nabla \bar{R}_\theta,
 \end{equation}
 </div>
@@ -49,7 +49,7 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 <p>Suppose we wish to estimate the expectation of $f(x)$ under a target distribution $p(x)$ from which direct sampling is difficult or unavailable:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:ppo-monte-carlo-expectation}
     E_{x \sim p}[f(x)] \approx \frac{1}{N} \sum_{i=1}^{N} f(x^i), \qquad x^i \sim p(x).
 \end{equation}
 </div>
@@ -60,7 +60,7 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 \begin{align}
     E_{x \sim p}[f(x)] &amp;= \int f(x) p(x)\, dx \nonumber \\
     &amp;= \int f(x) \frac{p(x)}{q(x)} q(x)\, dx \nonumber \\
-    &amp;= E_{x \sim q}\left[f(x) \frac{p(x)}{q(x)}\right].
+    &amp;= E_{x \sim q}\left[f(x) \frac{p(x)}{q(x)}\right].\label{eq:ppo-importance-sampling}
 \end{align}
 </div>
 
@@ -68,9 +68,9 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
 \begin{align}
-    \operatorname{Var}_{x \sim p}[f(x)] &amp;= E_{x \sim p}\big[f(x)^2\big] - \big(E_{x \sim p}[f(x)]\big)^2, \\
+    \operatorname{Var}_{x \sim p}[f(x)] &amp;= E_{x \sim p}\big[f(x)^2\big] - \big(E_{x \sim p}[f(x)]\big)^2,\label{eq:ppo-sampling-variance} \\
     \operatorname{Var}_{x \sim q}\left[f(x) \frac{p(x)}{q(x)}\right] &amp;= E_{x \sim q}\left[\left(f(x) \frac{p(x)}{q(x)}\right)^2\right] - \left(E_{x \sim q}\left[f(x) \frac{p(x)}{q(x)}\right]\right)^2 \nonumber \\
-    &amp;= E_{x \sim p}\left[f(x)^2 \frac{p(x)}{q(x)}\right] - \big(E_{x \sim p}[f(x)]\big)^2.
+    &amp;= E_{x \sim p}\left[f(x)^2 \frac{p(x)}{q(x)}\right] - \big(E_{x \sim p}[f(x)]\big)^2.\label{eq:ppo-importance-sampling-variance}
 \end{align}
 </div>
 
@@ -83,14 +83,14 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
 \begin{align}
     \nabla \bar{R}_\theta &amp;= E_{(s_t, a_t) \sim \pi_\theta}\big[A^\theta(s_t, a_t) \nabla \log p_\theta(a_t^n \mid s_t^n)\big] \nonumber \\
-    &amp;= E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(s_t, a_t)}{p_{\theta'}(s_t, a_t)} A^\theta(s_t, a_t) \nabla \log p_\theta(a_t^n \mid s_t^n)\right].
+    &amp;= E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(s_t, a_t)}{p_{\theta'}(s_t, a_t)} A^\theta(s_t, a_t) \nabla \log p_\theta(a_t^n \mid s_t^n)\right].\label{eq:ppo-joint-importance-gradient}
 \end{align}
 </div>
 
 <p>Factorizing the joint state-action probability $p_\theta(s_t, a_t) = p_\theta(a_t \mid s_t) p_\theta(s_t)$ and substituting $A^{\theta'}(s_t, a_t)$ (evaluated from trajectories gathered under $\theta'$):</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:ppo-factorized-importance-gradient}
     \nabla \bar{R}_\theta = E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} \frac{p_\theta(s_t)}{p_{\theta'}(s_t)} A^{\theta'}(s_t, a_t) \nabla \log p_\theta(a_t^n \mid s_t^n)\right].
 \end{equation}
 </div>
@@ -100,14 +100,14 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
 \begin{align}
     \nabla \bar{R}_\theta &amp;\approx E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t) \nabla \log p_\theta(a_t \mid s_t)\right] \nonumber \\
-    &amp;= E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{\nabla p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t)\right].
+    &amp;= E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{\nabla p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t)\right].\label{eq:ppo-surrogate-gradient}
 \end{align}
 </div>
 
 <p>Integrating with respect to $\theta$ gives the off-policy surrogate objective function $J^{\theta'}(\theta)$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:ppo-surrogate-objective}
     J^{\theta'}(\theta) = E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t)\right].
 \end{equation}
 </div>
@@ -121,7 +121,7 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 <p>TRPO maximizes $J^{\theta'}(\theta)$ subject to an explicit hard trust-region constraint on the KL divergence:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:ppo-trpo-objective}
     J_{\text{TRPO}}^{\theta'}(\theta) = E_{(s_t, a_t) \sim \pi_{\theta'}}\left[\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t)\right], \qquad \text{s.t. } \operatorname{KL}(\theta, \theta') &lt; \delta.
 \end{equation}
 </div>
@@ -131,7 +131,7 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 <p>PPO1 incorporates the KL divergence directly into the objective as a soft penalty weighted by an adaptive coefficient $\beta$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:ppo-kl-penalty-objective}
     J_{\text{PPO}}^{\theta'}(\theta) = J^{\theta'}(\theta) - \beta \operatorname{KL}(\theta, \theta').
 \end{equation}
 </div>
@@ -140,8 +140,8 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
 \begin{align}
-    \text{If } \operatorname{KL}(\theta, \theta') &gt; \operatorname{KL}_{\max}, \quad &amp;\text{increase } \beta \quad (\text{e.g., } \beta \leftarrow 2\beta), \\
-    \text{If } \operatorname{KL}(\theta, \theta') &lt; \operatorname{KL}_{\min}, \quad &amp;\text{decrease } \beta \quad (\text{e.g., } \beta \leftarrow \beta / 2).
+    \text{If } \operatorname{KL}(\theta, \theta') &gt; \operatorname{KL}_{\max}, \quad &amp;\text{increase } \beta \quad (\text{e.g., } \beta \leftarrow 2\beta),\label{eq:ppo-increase-penalty} \\
+    \text{If } \operatorname{KL}(\theta, \theta') &lt; \operatorname{KL}_{\min}, \quad &amp;\text{decrease } \beta \quad (\text{e.g., } \beta \leftarrow \beta / 2).\label{eq:ppo-decrease-penalty}
 \end{align}
 </div>
 
@@ -150,7 +150,7 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 <p>To avoid computing KL divergences explicitly, PPO2 enforces proximity by clipping the probability ratio $\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)}$ within $[1 - \epsilon, 1 + \epsilon]$:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:ppo-clipped-objective}
     J_{\text{PPO2}}^{\theta'}(\theta) \approx \sum_{(s_t, a_t)} \min\left( \frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)} A^{\theta'}(s_t, a_t),\; \operatorname{clip}\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 - \epsilon,\; 1 + \epsilon\right) A^{\theta'}(s_t, a_t) \right),
 \end{equation}
 </div>
@@ -158,7 +158,7 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 <p>where the clipping function is defined as:</p>
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
-\begin{equation}
+\begin{equation}\label{eq:ppo-clipping-function}
     \operatorname{clip}(r, 1 - \epsilon, 1 + \epsilon) = \begin{cases}
         1 - \epsilon, &amp; r &lt; 1 - \epsilon, \\
         r, &amp; 1 - \epsilon \le r \le 1 + \epsilon, \\
@@ -171,8 +171,8 @@ Importance sampling, trust regions, and the PPO surrogate objectives.
 
 <div class="math-block" role="region" aria-label="Equation" tabindex="0">
 \begin{align}
-    \text{Case 1 } \big(A^{\theta'}(s_t, a_t) &gt; 0\big): \quad &amp; \min\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 + \epsilon\right) A^{\theta'}(s_t, a_t), \\
-    \text{Case 2 } \big(A^{\theta'}(s_t, a_t) &lt; 0\big): \quad &amp; \max\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 - \epsilon\right) A^{\theta'}(s_t, a_t).
+    \text{Case 1 } \big(A^{\theta'}(s_t, a_t) &gt; 0\big): \quad &amp; \min\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 + \epsilon\right) A^{\theta'}(s_t, a_t),\label{eq:ppo-positive-advantage} \\
+    \text{Case 2 } \big(A^{\theta'}(s_t, a_t) &lt; 0\big): \quad &amp; \max\left(\frac{p_\theta(a_t \mid s_t)}{p_{\theta'}(a_t \mid s_t)},\; 1 - \epsilon\right) A^{\theta'}(s_t, a_t).\label{eq:ppo-negative-advantage}
 \end{align}
 </div>
 

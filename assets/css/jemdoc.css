@@ -228,7 +228,7 @@ mjx-container[display="true"] {
   max-width: none;
   min-width: 100%;
   overflow: visible;
-  width: max-content;
+  width: 100%;
 }
 
 .lecture-notes p mjx-container {
