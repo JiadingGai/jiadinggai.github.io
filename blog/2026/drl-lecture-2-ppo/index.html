@@ -4,7 +4,7 @@
 <meta name="generator" content="jemdoc+MathJax, see https://github.com/wsshin/jemdoc_mathjax" />
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="description" content="Jiading Gai&#x27;s personal study notes on importance sampling, trust regions, and the PPO surrogate objectives." />
+<meta name="description" content="Jiading Gai&#x27;s personal study notes on PPO, with a supplementary derivation of generalized advantage estimation (GAE)." />
 <link rel="canonical" href="https://jiadinggai.github.io/blog/2026/drl-lecture-2-ppo/" />
 <link rel="icon" type="image/svg+xml" href="/assets/img/church-lambda-icon.svg" />
 <link rel="stylesheet" href="/assets/css/jemdoc.css?v=20261118-equations" type="text/css" />
@@ -34,7 +34,7 @@ window.MathJax = {
 <td id="layout-content">
 <div id="toptitle">
 <h1>DRL Lecture 2: Proximal Policy Optimization</h1>
-<div id="subtitle">Importance sampling, trust regions, and the PPO surrogate objectives.
+<div id="subtitle">Importance sampling, trust regions, PPO objectives, and a supplementary GAE derivation.
 </div>
 </div>
 <article class="lecture-notes">
@@ -54,6 +54,7 @@ window.MathJax = {
 <li><a href="#importance-sampling-and-variance-analysis">Importance Sampling and Variance Analysis</a></li>
 <li><a href="#from-on-policy-to-off-policy-surrogate-objective">From On-Policy to Off-Policy Surrogate Objective</a></li>
 <li><a href="#trpo-and-proximal-policy-optimization-ppo">TRPO and Proximal Policy Optimization (PPO)</a></li>
+<li><a href="#supplementary-generalized-advantage-estimation-gae">Supplementary: Generalized Advantage Estimation (GAE)</a></li>
 <li><a href="#summary-of-notation">Summary of Notation</a></li>
 </ol></nav>
 <h2 id="on-policy-policy-gradient-recap-and-bottleneck">On-Policy Policy Gradient Recap and Bottleneck</h2>
@@ -210,6 +211,162 @@ window.MathJax = {
 
 <p>When $A^{\theta'} &gt; 0$, increasing $p_\theta(a_t \mid s_t)$ yields no additional objective gain once the ratio exceeds $1 + \epsilon$. When $A^{\theta'} &lt; 0$, decreasing $p_\theta(a_t \mid s_t)$ yields no additional objective gain once the ratio drops below $1 - \epsilon$.</p>
 
+<h2 id="supplementary-generalized-advantage-estimation-gae">Supplementary: Generalized Advantage Estimation (GAE)</h2>
+
+<p>This is my supplementary reading note on generalized advantage estimation (GAE), based on <a href="https://arxiv.org/abs/1506.02438">Schulman et al.&#x27;s original GAE paper</a>, Section 3. It extends the lecture-based discussion above. PPO needs an estimate of how much better a sampled action was than the policy's usual behavior; GAE supplies that estimate.</p>
+
+<h3 id="gae-1-advantage-and-the-td-residual">1. Advantage and the TD residual</h3>
+
+<p>Fix the rollout policy $\pi=\pi_{\theta'}$. Let $V_\gamma^\pi(s)$ be its expected discounted return from state $s$, and $Q_\gamma^\pi(s,a)$ the corresponding expectation when the first action is fixed to $a$. Rewards $r_t$ are received on transitions from $s_t$ to $s_{t+1}$. Use $0&lt;\gamma\le 1$, with finite episodes or convergent discounted sums; include the remaining time in the state for a finite-horizon task. The advantage is</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}\label{eq:ppo-gae-advantage}
+    A_\gamma^\pi(s,a)=Q_\gamma^\pi(s,a)-V_\gamma^\pi(s).
+\end{equation}
+</div>
+
+<p>Use a fixed critic $V(s)=V_\phi(s)$ to approximate $V_\gamma^\pi(s)$. Its temporal-difference (TD) residual compares a one-step reward plus predicted future value with the value predicted before the action:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}\label{eq:ppo-gae-td-residual}
+    \delta_t^V=r_t+\gamma V(s_{t+1})-V(s_t).
+\end{equation}
+</div>
+
+<p>Here $\delta_t^V$ is a TD residual, distinct from the TRPO threshold $\delta$. With an exact critic, the Bellman equation gives</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{align}
+    E[\delta_t^{V_\gamma^\pi}\mid s_t,a_t]
+    &amp;=E[r_t+\gamma V_\gamma^\pi(s_{t+1})\mid s_t,a_t]-V_\gamma^\pi(s_t)\nonumber\\
+    &amp;=Q_\gamma^\pi(s_t,a_t)-V_\gamma^\pi(s_t)
+      =A_\gamma^\pi(s_t,a_t).\label{eq:ppo-gae-td-expectation}
+\end{align}
+</div>
+
+<p>Thus a sampled TD residual estimates advantage. An approximate critic can introduce bias, since its prediction of the next state's value may be wrong.</p>
+
+<h3 id="gae-2-from-one-step-to-k-steps">2. From one step to k steps</h3>
+
+<p>To use more observed rewards before bootstrapping, add consecutive TD residuals with reward-discount weights. For two steps, expand both residuals:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{align}
+    \hat A_t^{(2)}
+    &amp;=\delta_t^V+\gamma\delta_{t+1}^V\nonumber\\
+    &amp;=\big[r_t+\gamma V(s_{t+1})-V(s_t)\big]\nonumber\\
+    &amp;\quad+\gamma\big[r_{t+1}+\gamma V(s_{t+2})-V(s_{t+1})\big]\nonumber\\
+    &amp;=r_t+\gamma r_{t+1}+\gamma^2V(s_{t+2})-V(s_t).
+    \label{eq:ppo-gae-two-step}
+\end{align}
+</div>
+
+<p>The terms $+\gamma V(s_{t+1})$ and $-\gamma V(s_{t+1})$ cancel. The same cancellation occurs at every intermediate state in a $k$-step sum:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}\label{eq:ppo-gae-k-step}
+    \hat A_t^{(k)}
+    =\sum_{\ell=0}^{k-1}\gamma^\ell\delta_{t+\ell}^V
+    =\sum_{\ell=0}^{k-1}\gamma^\ell r_{t+\ell}
+      +\gamma^kV(s_{t+k})-V(s_t).
+\end{equation}
+</div>
+
+<p>This is a bootstrapped $k$-step return minus the starting-state baseline. The residual sum and the return expression are exactly equal for each sampled trajectory, even when the critic is inaccurate.</p>
+
+<h3 id="gae-3-mix-horizons-to-derive-gae">3. Mix horizons to derive GAE</h3>
+
+<p>Rather than choosing one horizon $k$, assign it geometric weight $(1-\lambda)\lambda^{k-1}$, where $0\le\lambda&lt;1$. These weights sum to one. Define</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}\label{eq:ppo-gae-geometric-mixture}
+    \hat A_t^{\mathrm{GAE}(\gamma,\lambda)}
+    =(1-\lambda)\sum_{k=1}^{\infty}\lambda^{k-1}\hat A_t^{(k)}.
+\end{equation}
+</div>
+
+<p>A particular residual $\delta_{t+\ell}^V$ appears in every horizon $k\ge\ell+1$, always with factor $\gamma^\ell$. Its total coefficient across the mixture is therefore</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}\label{eq:ppo-gae-residual-weight}
+    (1-\lambda)\gamma^\ell\sum_{k=\ell+1}^{\infty}\lambda^{k-1}
+    =(1-\lambda)\gamma^\ell\frac{\lambda^\ell}{1-\lambda}
+    =(\gamma\lambda)^\ell.
+\end{equation}
+</div>
+
+<p>Collecting these coefficients gives the usual GAE formula (Equation 16 in the original paper):</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}\label{eq:ppo-gae-residual-sum}
+    \boxed{\hat A_t^{\mathrm{GAE}(\gamma,\lambda)}
+    =\sum_{\ell=0}^{\infty}(\gamma\lambda)^\ell\delta_{t+\ell}^V.}
+\end{equation}
+</div>
+
+<p>The geometric-mixture derivation uses $\lambda&lt;1$. The residual-sum form also defines the $\lambda=1$ endpoint when the sum converges, including a completed finite episode with zero value and rewards after termination.</p>
+
+<h3 id="gae-4-finite-rollouts-and-the-lambda-endpoints">4. Finite rollouts and the lambda endpoints</h3>
+
+<p>Suppose $H\ge1$ transitions remain in the current rollout segment, ending at $s_{t+H}$. Do not let a segment cross an episode reset. The finite estimator is</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}\label{eq:ppo-gae-finite-sum}
+    \hat A_t^{\mathrm{GAE},H}
+    =\sum_{\ell=0}^{H-1}(\gamma\lambda)^\ell\delta_{t+\ell}^V.
+\end{equation}
+</div>
+
+<p>Its equivalent mixture puts all remaining geometric weight on the longest available return:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}\label{eq:ppo-gae-finite-mixture}
+    \hat A_t^{\mathrm{GAE},H}
+    =(1-\lambda)\sum_{k=1}^{H-1}\lambda^{k-1}\hat A_t^{(k)}
+      +\lambda^{H-1}\hat A_t^{(H)}.
+\end{equation}
+</div>
+
+<p>For residual $\delta_{t+\ell}^V$, the horizon weights add to $(1-\lambda)\sum_{k=\ell+1}^{H-1}\lambda^{k-1}+\lambda^{H-1}=\lambda^\ell$; multiplying by $\gamma^\ell$ recovers the finite residual sum. The tail term is essential: simply cutting off the infinite mixture would leave its weights summing to less than one. Empty sums are zero, and a zeroth power is one, so this formula also covers $H=1$ and both endpoints.</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{align}
+    \lambda=0:\quad\hat A_t^{\mathrm{GAE},H}
+    &amp;=\delta_t^V,\label{eq:ppo-gae-lambda-zero}\\
+    \lambda=1:\quad\hat A_t^{\mathrm{GAE},H}
+    &amp;=\sum_{\ell=0}^{H-1}\gamma^\ell r_{t+\ell}
+      +\gamma^HV(s_{t+H})-V(s_t).\label{eq:ppo-gae-lambda-one}
+\end{align}
+</div>
+
+<p>At a true terminal state, set $V(s_{t+H})=0$. At a collection cutoff or an external time limit that does not terminate the underlying task, bootstrap from the final observation's value, before any reset. Stopping collection is not evidence that all future rewards are zero.</p>
+
+<p>Smaller $\lambda$ typically reduces variance while relying more on critic predictions. With an exact critic, the multi-step estimates and their mixtures are conditionally unbiased for advantage. With an imperfect critic, $\lambda&lt;1$ can introduce policy-gradient bias. At $\lambda=1$ and a true episode end, the result is a Monte Carlo discounted return minus a fixed, action-independent baseline: baseline error does not bias its policy-gradient contribution, although the advantage estimate itself need not be conditionally unbiased. A truncated rollout still retains possible bootstrap error at its endpoint.</p>
+
+<h3 id="gae-5-backward-computation-and-use-in-ppo">5. Backward computation and use in PPO</h3>
+
+<p>Separate the first term of the finite sum to obtain a backward recursion:</p>
+
+<div class="math-block" role="region" aria-label="Equation" tabindex="0">
+\begin{equation}\label{eq:ppo-gae-backward-recursion}
+    \hat A_t^{\mathrm{GAE},H}
+    =\delta_t^V+\gamma\lambda\hat A_{t+1}^{\mathrm{GAE},H-1},
+    \qquad \hat A_{t+H}^{\mathrm{GAE},0}=0.
+\end{equation}
+</div>
+
+<p>Start at the last transition and work backward once. The zero initializes the residual accumulator beyond the segment; it does not force the bootstrap value in the last TD residual to zero. Start a separate accumulator for each segment or episode.</p>
+
+<p>Collect the batch with $\pi_{\theta'}$, compute GAE using a fixed snapshot of the critic, and substitute $\hat A_t^{\mathrm{GAE},H}$ into the advantage slot of the clipped surrogate in $\eqref{eq:ppo-clipped-objective}$. Hold these weights and the old-policy probabilities fixed during the actor's optimization epochs. The <a href="https://arxiv.org/abs/1707.06347">original PPO paper</a> gives the finite GAE form in Section 5, Equations 11--12. GAE estimates the weights; PPO's clipping determines how those weights influence the policy update.</p>
+
+<p>Discounting convention: this supplement estimates $\gamma$-discounted advantages. GAE alone does not make an unweighted timestep surrogate the exact gradient of $J_\gamma(\theta)=E[\sum_{t=1}^{T}\gamma^{t-1}r_t]$. Under ordinary episode sampling, that exact gradient also carries the outer $\gamma^{t-1}$ factor discussed in <a href="https://jiadinggai.github.io/blog/2026/drl-lecture-1-policy-gradient/#tip-2-assigning-suitable-credit-reward-to-go-and-discounting">Lecture 1&#x27;s discounting section</a>. Section 2 of the GAE paper instead discusses discounting as a variance-reduction choice for an undiscounted objective.</p>
+
+<h3 id="gae-references-for-this-supplement">References for this supplement</h3>
+
+<p>John Schulman, Philipp Moritz, Sergey Levine, Michael I. Jordan, and Pieter Abbeel. <a href="https://arxiv.org/abs/1506.02438"><em>High-Dimensional Continuous Control Using Generalized Advantage Estimation</em></a>. ICLR 2016; first posted as arXiv:1506.02438 in 2015. See Sections 2–3, especially Equations 10–18.</p>
+
+<p>John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. <a href="https://arxiv.org/abs/1707.06347"><em>Proximal Policy Optimization Algorithms</em></a>. arXiv:1707.06347, 2017. See Section 5, Equations 11–12.</p>
+
 <h2 id="summary-of-notation">Summary of Notation</h2>
 
 <div class="table-scroll" role="region" aria-label="Notation summary" tabindex="0">
@@ -230,6 +387,12 @@ window.MathJax = {
 <tr><td>$\beta$</td><td>Adaptive KL penalty weight in PPO1</td></tr>
 <tr><td>$\operatorname{KL}_{\max}, \operatorname{KL}_{\min}$</td><td>Upper and lower KL thresholds governing adaptive updates to $\beta$</td></tr>
 <tr><td>$\epsilon$</td><td>Clipping hyperparameter defining the ratio interval $[1 - \epsilon, 1 + \epsilon]$ in PPO2</td></tr>
+<tr><td>$\gamma,\lambda$</td><td>Reward discount and GAE trace parameter</td></tr>
+<tr><td>$V_\phi(s)$</td><td>Critic approximation to the rollout policy's discounted state value</td></tr>
+<tr><td>$\delta_t^V$</td><td>TD residual of the fixed critic at transition $t$</td></tr>
+<tr><td>$k,H$</td><td>Return horizon and transitions remaining in the rollout segment</td></tr>
+<tr><td>$\hat A_t^{(k)}$</td><td>Bootstrapped $k$-step return minus the starting-state baseline</td></tr>
+<tr><td>$\hat A_t^{\mathrm{GAE},H}$</td><td>GAE estimate from the remaining $H$ transitions</td></tr>
 </tbody></table>
 </div>
 <nav class="lecture-pagination" aria-label="Lecture navigation">
